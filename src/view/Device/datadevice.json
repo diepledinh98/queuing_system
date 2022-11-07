@@ -1,0 +1,90 @@
+[
+    {
+        "id": "1",
+        "deviceID": "KIO_01",
+        "deviceName": "Kiosk",
+        "deviceIP": "192.168.1.10",
+        "deviceStatus": "Đang hoạt động",
+        "deviceConnect": "Đang kết nối",
+        "services": "Khám tổng quát",
+        "detail": "chi tiết",
+        "update": "cập nhật"
+    },
+    {
+        "id": "2",
+        "deviceID": "KIO_01",
+        "deviceName": "Kiosk",
+        "deviceIP": "192.168.1.10",
+        "deviceStatus": "Đang hoạt động",
+        "deviceConnect": "Đang kết nối",
+        "services": "Khám tổng quát",
+        "detail": "chi tiết",
+        "update": "cập nhật"
+    },
+    {
+        "id": "3",
+        "deviceID": "KIO_01",
+        "deviceName": "Kiosk",
+        "deviceIP": "192.168.1.10",
+        "deviceStatus": "Đang hoạt động",
+        "deviceConnect": "Đang kết nối",
+        "services": "Khám tổng quát",
+        "detail": "chi tiết",
+        "update": "cập nhật"
+    },
+    {
+        "id": "4",
+        "deviceID": "KIO_01",
+        "deviceName": "Kiosk",
+        "deviceIP": "192.168.1.10",
+        "deviceStatus": "Đang hoạt động",
+        "deviceConnect": "Đang kết nối",
+        "services": "Khám tổng quát",
+        "detail": "chi tiết",
+        "update": "cập nhật"
+    },
+    {
+        "id": "5",
+        "deviceID": "KIO_01",
+        "deviceName": "Kiosk",
+        "deviceIP": "192.168.1.10",
+        "deviceStatus": "Đang hoạt động",
+        "deviceConnect": "Đang kết nối",
+        "services": "Khám tổng quát",
+        "detail": "chi tiết",
+        "update": "cập nhật"
+    },
+    {
+        "id": "6",
+        "deviceID": "KIO_01",
+        "deviceName": "Kiosk",
+        "deviceIP": "192.168.1.10",
+        "deviceStatus": "Đang hoạt động",
+        "deviceConnect": "Đang kết nối",
+        "services": "Khám tổng quát",
+        "detail": "chi tiết",
+        "update": "cập nhật"
+    },
+    {
+        "id": "7",
+        "deviceID": "KIO_01",
+        "deviceName": "Kiosk",
+        "deviceIP": "192.168.1.10",
+        "deviceStatus": "Đang hoạt động",
+        "deviceConnect": "Đang kết nối",
+        "services": "Khám tổng quát",
+        "detail": "chi tiết",
+        "update": "cập nhật"
+    },
+    {
+        "id": "8",
+        "deviceID": "KIO_01",
+        "deviceName": "Kiosk",
+        "deviceIP": "192.168.1.10",
+        "deviceStatus": "Đang hoạt động",
+        "deviceConnect": "Đang kết nối",
+        "services": "Khám tổng quát",
+        "detail": "chi tiết",
+        "update": "cập nhật"
+    }
+]
