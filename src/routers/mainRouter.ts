@@ -13,8 +13,12 @@ import { IRouter } from './interface';
 import { routerViewAddDevice } from '@view/Device/AddDevice/router';
 import { routerViewDetailDevice } from '@view/Device/DetailDevice/router';
 import { routerViewUpdateDevice } from '@view/Device/UpdateDevice/router';
+import { routerViewAddService } from '@view/Service/AddService/router';
+import { routerViewDetailService } from '@view/Service/DetailService/router';
+import { routerViewUpdateService } from '@view/Service/UpdateService/router';
 export const privatePage: IRouter[] = [routerViewRoot, routerHomepage, routerViewProfile, routerViewAddDevice, routerViewDevice, routerViewDetailDevice,
-    routerViewReport, routerViewProvideNumber, routerViewService, routerViewSetting, routerViewUpdateDevice
+    routerViewReport, routerViewProvideNumber, routerViewService, routerViewSetting, routerViewUpdateDevice, routerViewAddService, routerViewDetailService,
+    routerViewUpdateService
 ];
 
 export const publicPage: IRouter[] = [routerLogin, routerForgotPassword];

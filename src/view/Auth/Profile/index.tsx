@@ -21,6 +21,7 @@ import ModalChangePassWord from './components/ModalChangePassWord';
 import { routerViewProfile } from './router';
 import { collection, DocumentData, onSnapshot, QuerySnapshot } from 'firebase/firestore';
 import { FirebaseConfig } from "../../../firebase/configs"
+
 const UserProfile = () => {
   const db = FirebaseConfig.getInstance().fbDB;
   const history = useNavigate();
@@ -30,6 +31,7 @@ const UserProfile = () => {
   const [isDisableForm, setIsDisableForm] = useState(true);
   const user = useSelector((state: RootState) => state.profile.user);
   const updateAccounts = useSingleAsync(authenticationPresenter.updateProfile);
+  console.log(user);
 
   const showModal = () => {
     setIsVisible(true);
@@ -43,6 +45,7 @@ const UserProfile = () => {
     username?: string
   }
   const [userprofile, setUserprofile] = useState<UserType[]>([])
+
   const navigate = useNavigate();
   // useEffect(() => {
   //   if (user != null) {

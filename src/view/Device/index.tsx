@@ -22,10 +22,13 @@ import { useAltaIntl } from '@shared/hook/useTranslate';
 
 import { IModal } from '../Homepage/interface';
 import { routerViewDevice } from './router';
-
+import { deviceStore } from '@modules/device/deviceStore';
+import { useDispatch } from 'react-redux';
+import { getDevices } from '@modules/device/respository';
 const dataTable = require('./datadevice.json');
 
 const Device = () => {
+
     const { formatMessage } = useAltaIntl();
     const table = useTable();
 
@@ -39,6 +42,15 @@ const Device = () => {
     const [filter, setFilterOption] = useState<any>();
     const navigate = useNavigate();
     const idChooses = 'id'; //get your id here. Ex: accountId, userId,...
+
+    const dispatch = useDispatch();
+    useEffect(() => {
+        getDevices().then((deviceSnap) => {
+            console.log(deviceSnap, "device snap");
+            dispatch(deviceStore.actions.fetchDevices({ devices: deviceSnap }));
+
+        });
+    }, []);
     const columns: ColumnsType = [
         {
             title: 'Mã thiết bị',

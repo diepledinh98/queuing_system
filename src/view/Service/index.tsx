@@ -1,6 +1,6 @@
 import './style.scss';
 
-import { Space } from 'antd';
+import { Space, DatePicker } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import React, { Key, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -19,7 +19,7 @@ import TableComponent from '@shared/components/TableComponent';
 import useTable from '@shared/components/TableComponent/hook';
 import { useAltaIntl } from '@shared/hook/useTranslate';
 
-
+import './style.scss'
 import { IModal } from '../Homepage/interface';
 import { routerViewService } from './router';
 
@@ -72,8 +72,8 @@ const Service = () => {
     ];
 
 
-    const linkAddDevice = () => {
-        navigate('/AddDevice');
+    const linkAddService = () => {
+        navigate('/addservice');
     }
 
     const handleRefresh = () => {
@@ -140,6 +140,15 @@ const Service = () => {
                                 textLabel={item.textLabel}
                             />
                         ))}
+
+                        <div className='select__time'>
+                            <p>Chọn thời gian</p>
+                            <Space direction="vertical" className='time'>
+                                <DatePicker picker="week" />
+                                <DatePicker picker="week" />
+                            </Space>
+
+                        </div>
                     </div>
                     <div className="d-flex flex-column ">
                         <div className="label-select">{formatMessage('common.keyword')}</div>
@@ -164,7 +173,7 @@ const Service = () => {
                         bordered
                         disableFirstCallApi={true}
                     />
-                    <div className='btn_add_device' onClick={linkAddDevice}>
+                    <div className='btn_add_device' onClick={linkAddService}>
                         Thêm dịch vụ
                     </div>
                 </div>
