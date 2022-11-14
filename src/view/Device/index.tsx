@@ -1,6 +1,6 @@
 import './style.scss';
 
-import { Space } from 'antd';
+import { Pagination, Space } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import React, { Key, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -22,13 +22,29 @@ import { useAltaIntl } from '@shared/hook/useTranslate';
 
 import { IModal } from '../Homepage/interface';
 import { routerViewDevice } from './router';
-import { deviceStore } from '@modules/device/deviceStore';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@modules';
+import { useAppDispatch, useAppSelector } from '@shared/hook/reduxhook';
 import { getDevices } from '@modules/device/respository';
+import { deviceStore } from '@modules/device/deviceStore';
+import { current } from '@reduxjs/toolkit';
 const dataTable = require('./datadevice.json');
+interface TypeDevices {
+    id?: string
+    deviceID?: string
+    deviceName?: string
+    deviceIP?: string
+    deviceStatus?: boolean
+    deviceConnect?: boolean
+    services?: string[]
+    detail?: string
+    update?: string
+}
 
 const Device = () => {
 
+
+    const [listDevice, setListDevice] = useState<TypeDevices[]>([])
     const { formatMessage } = useAltaIntl();
     const table = useTable();
 
@@ -43,14 +59,20 @@ const Device = () => {
     const navigate = useNavigate();
     const idChooses = 'id'; //get your id here. Ex: accountId, userId,...
 
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
+    const devices = useAppSelector((state) => state.device.devices);
     useEffect(() => {
         getDevices().then((deviceSnap) => {
-            console.log(deviceSnap, "device snap");
             dispatch(deviceStore.actions.fetchDevices({ devices: deviceSnap }));
-
         });
     }, []);
+
+    const onDetail = (id: string) => {
+        navigate(`/detaildevice/${id}`)
+    }
+    const onUpdate = (id: string) => {
+        navigate(`/updatedevice/${id}`)
+    }
     const columns: ColumnsType = [
         {
             title: 'Mã thiết bị',
@@ -70,23 +92,65 @@ const Device = () => {
         {
             title: 'Trạng thái hoạt động',
             dataIndex: 'deviceStatus',
-            render: () => <CircleLabel text={formatMessage('common.statusActive')} colorCode="green" />,
+            render: (status: boolean) => (
+                <>
+                    {status ? <CircleLabel text={formatMessage('common.statusActive')} colorCode="green" /> :
+                        <CircleLabel text={formatMessage('common.statusNotActive')} colorCode="red" />
+                    }
+                </>
+            )
+
+
+            ,
         },
         {
             title: 'Trạng thái kết nối',
             dataIndex: 'deviceConnect',
-            render: () => <CircleLabel text={formatMessage('common.onconnect')} colorCode="green" />,
+            render: (connect: boolean) => (
+                <>
+                    {connect ? <CircleLabel text={formatMessage('common.onconnect')} colorCode="green" /> :
+                        <CircleLabel text={formatMessage('common.stopconnect')} colorCode="red" />
+                    }
+                </>
+            )
         },
         {
             title: 'Dịch vụ sử dụng',
             dataIndex: 'services',
+
         }, {
             title: 'Chi tiết',
             dataIndex: 'detail',
+            render: (action: any, record: any) => {
+
+
+                return (
+                    <>
+                        <a
+                            onClick={() => onDetail(record.id)}
+                            style={{ textDecoration: "underline", color: "#4277FF", }}
+                        >Chi tiết</a>
+                    </>
+
+                )
+            }
         },
         {
             title: 'Cập nhật',
             dataIndex: 'update',
+            render: (action: any, record: any) => {
+
+
+                return (
+                    <>
+                        <a
+                            onClick={() => onUpdate(record.id)}
+                            style={{ textDecoration: "underline", color: "#4277FF", }}
+                        >Cập nhật</a>
+                    </>
+
+                )
+            }
         }
     ];
 
@@ -143,6 +207,15 @@ const Device = () => {
             setFilterOption((pre: any) => ({ ...pre, [name]: status }));
         }
     };
+
+    const [current, setCurrent] = useState(1)
+    //pagination 
+    const pageSize = 5
+    const getData = (current: any, pageSize: any) => {
+        return devices?.slice((current - 1) * pageSize, current * pageSize)
+    }
+    console.log(filter);
+
     return (
         <div className="homepage">
             <MainTitleComponent breadcrumbs={routerViewDevice} />
@@ -170,19 +243,28 @@ const Device = () => {
                     </div>
                 </div>
                 <div className='d-flex' >
+                    <div>
 
-                    <TableComponent
-                        // apiServices={}
-                        defaultOption={filter}
-                        translateFirstKey="homepage"
-                        rowKey={res => res[idChooses]}
-                        register={table}
-                        columns={columns}
-                        // onRowSelect={setSelectedRowKeys}
-                        dataSource={dataTable}
-                        bordered
-                        disableFirstCallApi={true}
-                    />
+                        <TableComponent
+                            // apiServices={}
+                            defaultOption={filter}
+                            translateFirstKey="homepage"
+                            rowKey={res => res[idChooses]}
+                            register={table}
+                            columns={columns}
+                            // onRowSelect={setSelectedRowKeys}
+                            dataSource={getData(current, pageSize)}
+                            bordered
+                            disableFirstCallApi={true}
+                            pagination={false}
+                        />
+                        <Pagination
+                            total={devices?.length}
+                            current={current}
+                            onChange={setCurrent}
+                            pageSize={pageSize}
+                        />
+                    </div>
                     <div className='btn_add_device' onClick={linkAddDevice}>
                         Thêm thiet bi
                     </div>

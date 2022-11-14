@@ -40,7 +40,12 @@ const Service = () => {
     const navigate = useNavigate();
     const idChooses = 'id'; //get your id here. Ex: accountId, userId,...
 
+    const [serviceID, setServiceID] = useState('')
+    const [serviceName, setServiceName] = useState('')
+    const [description, setDescription] = useState('')
+    const [checkprefix, setCheckprefix] = useState('')
 
+    console.log(checkprefix);
 
     const linkAddDevice = () => {
         navigate('/AddDevice');
@@ -51,29 +56,7 @@ const Service = () => {
         setSelectedRowKeys([]);
     };
 
-    const arrayAction: IArrayAction[] = [
-        {
-            iconType: 'add',
-            handleAction: () => {
-                // setModal({ dataEdit: null, isVisible: true });
-            },
-        },
-        { iconType: 'share' },
-        {
-            iconType: 'delete',
-            disable: selectedRowKeys?.length === 0,
-            handleAction: () => {
-                DeleteConfirm({
-                    content: formatMessage('common.delete'),
-                    handleOk: () => {
-                        // call Api Delete here
-                        handleRefresh();
-                    },
-                    handleCancel: () => { },
-                });
-            },
-        },
-    ];
+
     const dataString: ISelect[] = [{ label: 'common.all', value: undefined }, { label: 'common.onaction', value: undefined }, { label: 'common.stopaction', value: undefined }];
 
     const arraySelectFilter: ISelectAndLabel[] = [

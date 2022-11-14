@@ -1,18 +1,17 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { stat } from "fs";
 
-type deviceProps = {
+type serviceProps = {
     id?: string
-    deviceID: string;
-    deviceName: string;
-    deviceIP: string;
-    deviceStatus: boolean
-    deviceConnect: boolean
-    services: string[]
-    detail: string
-    update: string
-    username: string
-    password: string
+    serviceID: string;
+    serviceName: string;
+    serviceStatus: boolean
+    SyntaxProvide: {
+        Growauto?: number[]
+        Prefix?: string
+        Surfix?: string
+        Reset?: boolean
+    }
 };
 // const device = {
 //     deviceId: "",
@@ -25,32 +24,32 @@ type deviceProps = {
 // };
 interface IStore {
     statusAdd?: boolean;
-    devices?: deviceProps[] | object[];
+    services?: serviceProps[] | object[];
 }
 // export const fetchDevices = createAction<{
 //   devices: Array<object | undefined>;
 // }>("devices/get");
-export const addDeviceInStore = createAction<{ device: object }>("devices/add");
-export const deviceStore = createSlice({
-    name: "deviceStore",
+export const addServiceInStore = createAction<{ service: object }>("services/add");
+export const serviceStore = createSlice({
+    name: "serviceStore",
     initialState: {
         statusAdd: false,
-        devices: [],
+        services: [],
     } as unknown as IStore,
     reducers: {
-        addDeviceInStore: (
+        addServiceInStore: (
             state,
             action: PayloadAction<{
-                device: object;
+                service: object;
             }>
-        ) => Object.assign(state, { device: action.payload }),
+        ) => Object.assign(state, { service: action.payload }),
 
-        fetchDevices: (
+        fetchService: (
             state,
             action: PayloadAction<{
-                devices: object[] | any;
+                services: object[] | any;
             }>
-        ) => Object.assign(state, { devices: action.payload.devices }),
+        ) => Object.assign(state, { services: action.payload.services }),
 
         // fetchDevices: (
         //   state,

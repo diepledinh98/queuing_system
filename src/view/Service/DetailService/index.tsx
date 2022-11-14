@@ -22,9 +22,12 @@ import { Col, Row, Input, Checkbox, InputNumber } from 'antd';
 import './style.scss'
 
 import { routerViewDetailService } from './router';
-
+import { useParams } from 'react-router';
+import { useAppSelector } from '@shared/hook/reduxhook';
 const dataTable = require('./datadetailservice.json');
 const { TextArea } = Input;
+
+
 const DetailDervice = () => {
     const { formatMessage } = useAltaIntl();
     const table = useTable();
@@ -39,6 +42,15 @@ const DetailDervice = () => {
     const [filter, setFilterOption] = useState<any>();
     const navigate = useNavigate();
     const idChooses = 'id'; //get your id here. Ex: accountId, userId,...
+    const { id } = useParams()
+
+    const services: Array<any> | undefined = useAppSelector((state) => {
+        return state.service.services
+    });
+    const service = services?.find((value) => value.id == id);
+
+    console.log(service.SyntaxProvide);
+
 
     const columns: ColumnsType = [
         {
@@ -119,44 +131,71 @@ const DetailDervice = () => {
                     </div>
                     <Row style={{ marginTop: 12 }}>
                         <Col flex="120px" className="text__info_name">Mã dịch vụ:</Col>
-                        <Col flex="auto" className="text__info">201</Col>
+                        <Col flex="auto" className="text__info">{service.serviceID}</Col>
                     </Row>
                     <Row style={{ marginTop: 12 }}>
                         <Col flex="120px" className="text__info_name">Tên dịch vụ:</Col>
-                        <Col flex="auto" className="text__info">Khám tim mạch</Col>
+                        <Col flex="auto" className="text__info">{service.serviceName}</Col>
                     </Row>
                     <Row style={{ marginTop: 12 }}>
                         <Col flex="120px" className="text__info_name">Mô tả:</Col>
-                        <Col flex="auto" className="text__info">Chuyên về các bệnh lý về tim</Col>
+                        <Col flex="auto" className="text__info">{service.description}</Col>
                     </Row>
 
                     <div className='title' style={{ marginTop: 16 }}>
                         Quy tắc cấp số
                     </div>
 
-                    <div className="sytax__number" >
+                    {
+                        service.SyntaxProvide.Growauto ?
 
-                        Tăng tự động:
-                        <Input className="input__number" />
-                        đến
-                        <Input className="input__number" />
-                    </div>
-                    <div className="sytax__number">
+                            <div className="sytax__number" >
 
-                        Prefix:
-                        <Input className="input__number" style={{ marginLeft: 65 }} />
+                                Tăng tự động:
+                                <Input className="input__number" value={service.SyntaxProvide.Growauto[0]} />
+                                đến
+                                <Input className="input__number" value={service.SyntaxProvide.Growauto[1]} />
+                            </div>
+                            :
+                            <></>
+                    }
+                    {
+                        service.SyntaxProvide.Prefix ?
+                            <div className="sytax__number">
 
-                    </div>
-                    <div className="sytax__number">
+                                Prefix:
+                                <Input className="input__number" style={{ marginLeft: 65 }} value={service.SyntaxProvide.Prefix} />
 
-                        Reset mỗi ngày
+                            </div>
+                            :
+                            <></>
+                    }
+
+                    {
+                        service.SyntaxProvide.Surfix ?
+                            <div className="sytax__number">
+
+                                Prefix:
+                                <Input className="input__number" style={{ marginLeft: 65 }} value={service.SyntaxProvide.Surfix} />
+
+                            </div>
+                            :
+                            <></>
+                    }
+
+                    {service.SyntaxProvide.Reset ?
+                        <div className="sytax__number">
+                            Reset mỗi ngày
+                        </div>
+                        :
+                        <></>
+                    }
 
 
-                    </div>
 
                 </div>
                 <div className='table_detailservice'>
-                    <div className="main-card" style={{ background: 'none', marginTop: 50 }}>
+                    <div className="main-card" style={{ background: 'none' }}>
 
                         <div className="d-flex flex-row justify-content-md-between mb-3 align-items-end">
                             <div className="d-flex flex-row " style={{ gap: 10 }}>

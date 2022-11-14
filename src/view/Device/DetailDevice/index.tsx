@@ -3,8 +3,18 @@ import MainTitleComponent from '@shared/components/MainTitleComponent';
 import { routerViewDetailDevice } from './router'
 import { Avatar, Col, Row, Input, Select } from 'antd';
 import './detail_device.scss'
-
+import { useParams } from 'react-router';
+import { useAppSelector } from '@shared/hook/reduxhook';
+import { Link } from 'react-router-dom';
 const DetailDevice = () => {
+    const { id } = useParams()
+
+    const devices: Array<any> | undefined = useAppSelector((state) => {
+        return state.device.devices;
+    });
+    const device = devices?.find((value) => value.id == id);
+
+
     return (
         <div className='detail__device_page'>
             <MainTitleComponent breadcrumbs={routerViewDetailDevice} />
@@ -25,14 +35,14 @@ const DetailDevice = () => {
                                 <Col span={12}>
                                     <Row>
                                         <Col flex="130px" className="text__info_name">Mã thiết bị:</Col>
-                                        <Col flex="auto" className="text__info"></Col>
+                                        <Col flex="auto" className="text__info">{device.deviceID}</Col>
                                     </Row>
                                 </Col>
 
                                 <Col span={12}>
                                     <Row>
                                         <Col flex="130px" className="text__info_name">Loại thiết bị:</Col>
-                                        <Col flex="auto" className="text__info"></Col>
+                                        <Col flex="auto" className="text__info">{device.deviceName}</Col>
                                     </Row>
                                 </Col>
 
@@ -41,14 +51,14 @@ const DetailDevice = () => {
                                 <Col span={12}>
                                     <Row>
                                         <Col flex="130px" className="text__info_name">Tên thiết bị:</Col>
-                                        <Col flex="auto" className="text__info"></Col>
+                                        <Col flex="auto" className="text__info">{device.deviceName}</Col>
                                     </Row>
                                 </Col>
 
                                 <Col span={12}>
                                     <Row>
                                         <Col flex="130px" className="text__info_name">Tên đăng nhập:</Col>
-                                        <Col flex="auto" className="text__info">Diep LE</Col>
+                                        <Col flex="auto" className="text__info">{device.username}</Col>
                                     </Row>
                                 </Col>
 
@@ -57,14 +67,14 @@ const DetailDevice = () => {
                                 <Col span={12}>
                                     <Row>
                                         <Col flex="130px" className="text__info_name">Địa chỉ IP:</Col>
-                                        <Col flex="auto" className="text__info"></Col>
+                                        <Col flex="auto" className="text__info">{device.deviceIP}</Col>
                                     </Row>
                                 </Col>
 
                                 <Col span={12}>
                                     <Row>
                                         <Col flex="130px" className="text__info_name">Mật khẩu:</Col>
-                                        <Col flex="auto" className="text__info">CMS</Col>
+                                        <Col flex="auto" className="text__info">{device.password}</Col>
                                     </Row>
                                 </Col>
 
@@ -78,14 +88,29 @@ const DetailDevice = () => {
                                     color: '#535261',
                                     marginLeft: 24
                                 }}>
+                                    {device?.services?.map((service, index) => {
 
+
+                                        return (
+                                            <div
+                                                style={{
+                                                    fontSize: 16,
+                                                    fontWeight: 400,
+                                                    color: '#535261',
+                                                    display: 'flex'
+                                                }}
+
+                                            >{`${service}, `}</div>
+                                        )
+                                    })}
                                 </Col>
                             </Row>
                         </div>
                     </div>
-                    <div className="update__device">
+                    <Link to={`/updatedevice/${device.id}`} className="update__device" >
+
                         Cập nhật thiết bị
-                    </div>
+                    </Link>
 
                 </div>
             </div>

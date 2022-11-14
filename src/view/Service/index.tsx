@@ -22,7 +22,9 @@ import { useAltaIntl } from '@shared/hook/useTranslate';
 import './style.scss'
 import { IModal } from '../Homepage/interface';
 import { routerViewService } from './router';
-
+import { serviceStore } from '@modules/service/serviceStore';
+import { getServices } from '@modules/service/respository';
+import { useAppDispatch, useAppSelector } from '@shared/hook/reduxhook';
 const dataTable = require('./dataservice.json');
 
 const Service = () => {
@@ -39,6 +41,20 @@ const Service = () => {
     const [filter, setFilterOption] = useState<any>();
     const navigate = useNavigate();
     const idChooses = 'id'; //get your id here. Ex: accountId, userId,...
+    const dispatch = useAppDispatch()
+    const services = useAppSelector((state) => state.service.services)
+    useEffect(() => {
+        getServices().then((serviceSnap) => {
+            dispatch(serviceStore.actions.fetchService({ services: serviceSnap }))
+        });
+    }, []);
+
+    const onDetail = (id: string) => {
+        navigate(`/detailservice/${id}`)
+    }
+    const onUpdate = (id: string) => {
+        navigate(`/updateservice/${id}`)
+    }
     const columns: ColumnsType = [
         {
             title: 'Mã dịch vụ',
@@ -53,7 +69,7 @@ const Service = () => {
         },
         {
             title: 'Mô tả',
-            dataIndex: 'servicedes',
+            dataIndex: 'description',
         },
         {
             title: 'Trạng thái hoạt động',
@@ -64,10 +80,39 @@ const Service = () => {
         {
             title: 'Chi tiết',
             dataIndex: 'detail',
+            align: 'center',
+            render: (action: any, record: any) => {
+
+
+                return (
+                    <>
+                        <a
+                            onClick={() => onDetail(record.id)}
+                            style={{ textDecoration: "underline", color: "#4277FF", }}
+                        >Chi tiết</a>
+                    </>
+
+                )
+            }
         },
         {
             title: 'Cập nhật',
             dataIndex: 'update',
+            align: 'center',
+            render: (action: any, record: any) => {
+
+                console.log(record);
+
+                return (
+                    <>
+                        <a
+                            onClick={() => onUpdate(record.id)}
+                            style={{ textDecoration: "underline", color: "#4277FF", }}
+                        >Cập nhật</a>
+                    </>
+
+                )
+            }
         }
     ];
 
@@ -169,7 +214,7 @@ const Service = () => {
                         register={table}
                         columns={columns}
                         // onRowSelect={setSelectedRowKeys}
-                        dataSource={dataTable}
+                        dataSource={services}
                         bordered
                         disableFirstCallApi={true}
                     />

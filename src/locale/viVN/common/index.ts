@@ -11,6 +11,7 @@ export default {
   'common.share': 'Chia sẻ',
   'common.listen': 'Nghe',
   'common.statusActive': 'Đang hoạt động',
+  'common.statusNotActive': 'Ngưng hoạt động',
   'common.add': 'Thêm',
   'common.addSchool': 'Đăng ký trường',
   'common.edit': 'Sửa',

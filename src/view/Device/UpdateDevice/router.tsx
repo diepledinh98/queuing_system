@@ -1,7 +1,7 @@
 import { IRouter } from '@routers/interface';
 
 export const routerViewUpdateDevice: IRouter = {
-    path: '/updatedevice',
+    path: '/updatedevice/:id',
     name: `common.updatedevice`,
     loader: import('./index'),
     exact: true,
