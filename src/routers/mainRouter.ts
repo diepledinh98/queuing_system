@@ -17,9 +17,12 @@ import { routerViewAddService } from '@view/Service/AddService/router';
 import { routerViewDetailService } from '@view/Service/DetailService/router';
 import { routerViewUpdateService } from '@view/Service/UpdateService/router';
 import { routerViewAddProvideNumber } from '@view/ProvideNumber/AddProvideNumber/router';
+import { routerAddAccount } from '@view/SettingSystem/manage/Account/AddCount/router';
+import { routerUpdateAccount } from '@view/SettingSystem/manage/Account/UpdateAccount/router';
+import { routerViewDetailProvideNumber } from '@view/ProvideNumber/DetailProvideNumber/router';
 export const privatePage: IRouter[] = [routerViewRoot, routerHomepage, routerViewProfile, routerViewAddDevice, routerViewDevice, routerViewDetailDevice,
     routerViewReport, routerViewProvideNumber, routerViewService, routerViewSetting, routerViewUpdateDevice, routerViewAddService, routerViewDetailService,
-    routerViewUpdateService, routerViewAddProvideNumber
+    routerViewUpdateService, routerViewAddProvideNumber, routerAddAccount, routerUpdateAccount, routerViewDetailProvideNumber
 ];
 
 export const publicPage: IRouter[] = [routerLogin, routerForgotPassword];

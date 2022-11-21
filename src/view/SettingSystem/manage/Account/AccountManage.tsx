@@ -21,9 +21,11 @@ import { useAltaIntl } from '@shared/hook/useTranslate';
 
 
 // import { IModal } from '../Homepage/interface';
-import { routerViewSetting } from '../router';
+import { routerViewSetting } from '../../router';
+import { useAppDispatch, useAppSelector } from '@shared/hook/reduxhook';
+import { getAccount } from '@modules/account/respository';
+import { accountStore } from '@modules/account/accoutStore';
 
-const dataTable = require('../../ProvideNumber/dataprovidenumber.json');
 
 const AccountManager = () => {
     const { formatMessage } = useAltaIntl();
@@ -39,50 +41,79 @@ const AccountManager = () => {
     const [filter, setFilterOption] = useState<any>();
     const navigate = useNavigate();
     const idChooses = 'id'; //get your id here. Ex: accountId, userId,...
+
+    const dispatch = useAppDispatch();
+    const accounts: Array<any> | undefined = useAppSelector((state) => state.account.account);
+    useEffect(() => {
+
+        getAccount().then((accountSnap) => {
+            dispatch(accountStore.actions.fetchAccount({ account: accountSnap }));
+        });
+
+
+    }, []);
+
+    const onUpdate = (id: string) => {
+        navigate(`/updateaccount/${id}`)
+    }
     const columns: ColumnsType = [
         {
-            title: 'STT',
-            dataIndex: 'number',
+            title: 'Tên đăng nhập',
+            dataIndex: 'email',
             align: 'left'
         },
         {
-            title: 'Tên khách hàng',
+            title: 'Họ Tên',
             className: 'column-money',
-            dataIndex: 'customerName',
+            dataIndex: 'username',
         },
         {
-            title: 'Tên dịch vụ',
+            title: 'Số điện thoại',
             className: 'column-money',
-            dataIndex: 'serviceName',
+            dataIndex: 'phone',
             align: 'left',
         },
         {
-            title: 'Thời gian cấp',
-            dataIndex: 'GrantTime',
+            title: 'Eamil',
+            dataIndex: 'email',
         },
         {
-            title: 'Hạn sử dụng',
-            dataIndex: 'expiry',
+            title: 'Vai trò',
+            dataIndex: 'role',
         },
         {
             title: 'Trạng thái',
             dataIndex: 'status',
-            render: () => <CircleLabel text={formatMessage('common.statusActive')} colorCode="green" />,
+            render: (status: boolean) => (
+                <>
+                    {status ? <CircleLabel text={formatMessage('common.statusActive')} colorCode="green" /> :
+                        <CircleLabel text={formatMessage('common.statusNotActive')} colorCode="red" />
+                    }
+                </>
+            )
         },
 
+
         {
-            title: 'Nguồn cấp',
-            dataIndex: 'powerSupply',
-        },
-        {
-            title: 'Chi tiết',
-            dataIndex: 'detail',
+            title: 'Cập nhật',
+            align: 'center',
+            render: (action: any, record: any) => {
+                return (
+                    <>
+                        <a
+                            onClick={() => onUpdate(record.id)}
+                            style={{ textDecoration: "underline", color: "#4277FF", }}
+                        >Cập nhật</a>
+                    </>
+
+                )
+            }
         }
     ];
 
 
-    const linkAddDevice = () => {
-        navigate('/AddDevice');
+    const linkAddAccount = () => {
+        navigate('/addaccount');
     }
 
     const handleRefresh = () => {
@@ -169,12 +200,12 @@ const AccountManager = () => {
                         register={table}
                         columns={columns}
                         // onRowSelect={setSelectedRowKeys}
-                        dataSource={dataTable}
+                        dataSource={accounts}
                         bordered
                         disableFirstCallApi={true}
                     />
-                    <div className='btn_add_device' onClick={linkAddDevice}>
-                        Thêm dịch vụ
+                    <div className='btn_add_device' onClick={linkAddAccount}>
+                        Thêm tài khoản
                     </div>
                 </div>
             </div>

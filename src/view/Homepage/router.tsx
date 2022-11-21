@@ -7,7 +7,7 @@ export const routerHomepage: IRouter = {
   exact: true,
   name: 'common.homepage',
   menu: {
-    // icon: <DashboardIcon />,
+    icon: <DashboardIcon />,
     'exact': true,
     activePath: /home/i,
     'hideInNavbar': false

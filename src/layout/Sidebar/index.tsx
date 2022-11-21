@@ -17,7 +17,7 @@ interface IRenderMenuProps {
 
 const renderMenu: React.FC<IRenderMenuProps> = (props: IRenderMenuProps) => {
   const listNav = props.listNav.slice(1, props.listNav.length + 1);
-  console.log('listNav:', listNav);
+  // console.log('listNav:', listNav);
 
   return (
     <>

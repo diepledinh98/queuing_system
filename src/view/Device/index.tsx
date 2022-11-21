@@ -45,6 +45,7 @@ const Device = () => {
 
 
     const [listDevice, setListDevice] = useState<TypeDevices[]>([])
+    const [result, setResult] = useState<TypeDevices[] | undefined>();
     const { formatMessage } = useAltaIntl();
     const table = useTable();
 
@@ -60,11 +61,14 @@ const Device = () => {
     const idChooses = 'id'; //get your id here. Ex: accountId, userId,...
 
     const dispatch = useAppDispatch();
-    const devices = useAppSelector((state) => state.device.devices);
+    const devices: Array<any> | undefined = useAppSelector((state) => state.device.devices);
     useEffect(() => {
+
         getDevices().then((deviceSnap) => {
             dispatch(deviceStore.actions.fetchDevices({ devices: deviceSnap }));
         });
+
+
     }, []);
 
     const onDetail = (id: string) => {
@@ -117,6 +121,17 @@ const Device = () => {
         {
             title: 'Dịch vụ sử dụng',
             dataIndex: 'services',
+            render: (texts: string[]) => {
+
+                return (
+                    <div className='d-flex' style={{ flexDirection: 'column' }}>
+                        {
+
+                            `${texts[0]},...`}
+                        <div style={{ textDecoration: 'underline', color: '#4277FF' }}>Xem Thêm</div>
+                    </div>
+                )
+            }
 
         }, {
             title: 'Chi tiết',
@@ -164,29 +179,7 @@ const Device = () => {
         setSelectedRowKeys([]);
     };
 
-    const arrayAction: IArrayAction[] = [
-        {
-            iconType: 'add',
-            handleAction: () => {
-                setModal({ dataEdit: null, isVisible: true });
-            },
-        },
-        { iconType: 'share' },
-        {
-            iconType: 'delete',
-            disable: selectedRowKeys?.length === 0,
-            handleAction: () => {
-                DeleteConfirm({
-                    content: formatMessage('common.delete'),
-                    handleOk: () => {
-                        // call Api Delete here
-                        handleRefresh();
-                    },
-                    handleCancel: () => { },
-                });
-            },
-        },
-    ];
+
     const dataString: ISelect[] = [{ label: 'common.all', value: undefined }, { label: 'common.onaction', value: undefined }, { label: 'common.stopaction', value: undefined }];
     const dataStringConnect: ISelect[] = [{ label: 'common.all', value: undefined }, { label: 'common.onconnect', value: undefined }, { label: 'common.stopconnect', value: undefined }];
     const arraySelectFilter: ISelectAndLabel[] = [
@@ -195,43 +188,62 @@ const Device = () => {
     ];
 
     useEffect(() => {
-        table.fetchData({ option: { search: search, filter: { ...filter } } });
+
+
     }, [search, filter, table]);
 
     const handleSearch = (searchKey: string) => {
         setSearch(searchKey);
+        const foundItems = devices?.filter((item) => {
+            return item.deviceName.toLowerCase()?.includes(search)
+        })
+
+        setResult(foundItems)
+
     };
 
     const onChangeSelectStatus = (name: string | undefined) => (status: any) => {
         if (name && status) {
             setFilterOption((pre: any) => ({ ...pre, [name]: status }));
         }
-    };
+        console.log(name);
 
+    };
     const [current, setCurrent] = useState(1)
     //pagination 
-    const pageSize = 5
+    const pageSize = 10
     const getData = (current: any, pageSize: any) => {
-        return devices?.slice((current - 1) * pageSize, current * pageSize)
+        if (result && result.length > 0) {
+            return result?.slice((current - 1) * pageSize, current * pageSize)
+        }
+        else {
+            return devices?.slice((current - 1) * pageSize, current * pageSize)
+        }
+
     }
-    console.log(filter);
 
     return (
-        <div className="homepage">
+        <div className="device">
             <MainTitleComponent breadcrumbs={routerViewDevice} />
             <div className="main-card" style={{ background: 'none', marginTop: 50 }}>
 
                 <div className="d-flex flex-row justify-content-md-between mb-3 align-items-end">
                     <div className="d-flex flex-row " style={{ gap: 10 }}>
-                        {arraySelectFilter.map(item => (
-                            <SelectAndLabelComponent
-                                onChange={onChangeSelectStatus(item.name)}
-                                key={item.name}
-                                className="margin-select"
-                                dataString={item.dataString || dataStringConnect}
-                                textLabel={item.textLabel}
-                            />
-                        ))}
+                        {arraySelectFilter.map(item => {
+                            console.log(item.name);
+
+                            return (
+
+                                <SelectAndLabelComponent
+                                    onChange={onChangeSelectStatus(item.name)}
+                                    key={item.name}
+                                    className="margin-select"
+                                    dataString={item.dataString || dataStringConnect}
+                                    textLabel={item.textLabel}
+                                />
+                            )
+                        }
+                        )}
                     </div>
                     <div className="d-flex flex-column ">
                         <div className="label-select">{formatMessage('common.keyword')}</div>

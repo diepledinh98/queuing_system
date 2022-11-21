@@ -22,13 +22,23 @@ import { useAltaIntl } from '@shared/hook/useTranslate';
 
 import { IModal } from '../Homepage/interface';
 import { routerViewReport } from './router';
-
+import { useAppDispatch, useAppSelector } from '@shared/hook/reduxhook';
+import { provideNumberStore } from '@modules/providenumber/numberStore';
+import { getProvideNumber } from '@modules/providenumber/respository';
 const dataTable = require('./datareport.json');
+interface DataType {
+    id?: string
+    reportNumber?: string
+    serviceName?: string
+    GrantTime?: string
+    status?: string
+    powerSupply?: string
 
+}
 const Report = () => {
     const { formatMessage } = useAltaIntl();
     const table = useTable();
-
+    let data: DataType[] | any;
     const [modal, setModal] = useState<IModal>({
         isVisible: false,
         dataEdit: null,
@@ -39,6 +49,22 @@ const Report = () => {
     const [filter, setFilterOption] = useState<any>();
     const navigate = useNavigate();
     const idChooses = 'id'; //get your id here. Ex: accountId, userId,...
+
+    const dispatch = useAppDispatch()
+    const providenumber = useAppSelector((state) => state.providenumber.providenumber)
+    data = providenumber?.map((item, index) => {
+
+
+        return {
+            id: item?.id,
+            reportNumber: item?.stt,
+            serviceName: item.service.serviceName,
+            GrantTime: item?.timeprovide,
+            status: item?.status,
+            powerSupply: 'Kiosk'
+        }
+    })
+
     const columns: ColumnsType = [
         {
             title: 'Số thứ tụ',
@@ -58,7 +84,16 @@ const Report = () => {
         {
             title: 'Tình trạng',
             dataIndex: 'status',
-            render: () => <CircleLabel text={formatMessage('common.statusActive')} colorCode="green" />,
+            render: (status: string) => (
+                <>
+                    {status == 'waiting' ? <CircleLabel text={formatMessage('common.statuswaiting')} colorCode="blue" /> : (
+                        status == 'used' ? <CircleLabel text={formatMessage('common.statusNotActive')} colorCode="red" /> :
+                            <CircleLabel text={formatMessage('common.statusNotActive')} colorCode="red" />
+                    )
+
+                    }
+                </>
+            )
         },
 
         {
@@ -77,29 +112,7 @@ const Report = () => {
         setSelectedRowKeys([]);
     };
 
-    const arrayAction: IArrayAction[] = [
-        {
-            iconType: 'add',
-            handleAction: () => {
-                setModal({ dataEdit: null, isVisible: true });
-            },
-        },
-        { iconType: 'share' },
-        {
-            iconType: 'delete',
-            disable: selectedRowKeys?.length === 0,
-            handleAction: () => {
-                DeleteConfirm({
-                    content: formatMessage('common.delete'),
-                    handleOk: () => {
-                        // call Api Delete here
-                        handleRefresh();
-                    },
-                    handleCancel: () => { },
-                });
-            },
-        },
-    ];
+
     const dataString: ISelect[] = [{ label: 'common.all', value: undefined }, { label: 'common.onaction', value: undefined }, { label: 'common.stopaction', value: undefined }];
 
     const arraySelectFilter: ISelectAndLabel[] = [
@@ -156,12 +169,12 @@ const Report = () => {
                         register={table}
                         columns={columns}
                         // onRowSelect={setSelectedRowKeys}
-                        dataSource={dataTable}
+                        dataSource={data}
                         bordered
                         disableFirstCallApi={true}
                     />
                     <div className='btn_add_device' onClick={linkAddDevice}>
-                        Thêm dịch vụ
+                        Tải về
                     </div>
                 </div>
             </div>

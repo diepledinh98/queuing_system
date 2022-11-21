@@ -25,7 +25,7 @@ export const routerViewSetting: IRouter = {
         {
             path: '/setting/manage/account',
             name: 'common.manage.account',
-            loader: import('./manage/AccountManage'),
+            loader: import('./manage/Account/AccountManage'),
             exact: true,
             menu: {
                 'exact': true,
@@ -33,6 +33,7 @@ export const routerViewSetting: IRouter = {
                 'hideInNavbar': false
             }
         },
+
         {
             path: '/setting/log/user',
             name: 'common.log.user',

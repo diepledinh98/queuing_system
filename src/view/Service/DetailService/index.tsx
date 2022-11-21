@@ -66,38 +66,9 @@ const DetailDervice = () => {
     ];
 
 
-    const linkAddDevice = () => {
-        navigate('/AddDevice');
-    }
 
-    const handleRefresh = () => {
-        table.fetchData({ option: { search: search, filter: { ...filter } } });
-        setSelectedRowKeys([]);
-    };
 
-    const arrayAction: IArrayAction[] = [
-        {
-            iconType: 'add',
-            handleAction: () => {
-                // setModal({ dataEdit: null, isVisible: true });
-            },
-        },
-        { iconType: 'share' },
-        {
-            iconType: 'delete',
-            disable: selectedRowKeys?.length === 0,
-            handleAction: () => {
-                DeleteConfirm({
-                    content: formatMessage('common.delete'),
-                    handleOk: () => {
-                        // call Api Delete here
-                        handleRefresh();
-                    },
-                    handleCancel: () => { },
-                });
-            },
-        },
-    ];
+
     const dataString: ISelect[] = [{ label: 'common.all', value: undefined }, { label: 'common.onaction', value: undefined }, { label: 'common.stopaction', value: undefined }];
 
     const arraySelectFilter: ISelectAndLabel[] = [
@@ -118,6 +89,16 @@ const DetailDervice = () => {
             setFilterOption((pre: any) => ({ ...pre, [name]: status }));
         }
     };
+
+    const handleUpdateService = () => {
+        navigate(`/updateservice/${id}`)
+    }
+
+    const handleBack = () => {
+        navigate('/service')
+    }
+
+
     return (
         <div className="detailservice__page">
             <MainTitleComponent breadcrumbs={routerViewDetailService} />
@@ -147,24 +128,24 @@ const DetailDervice = () => {
                     </div>
 
                     {
-                        service.SyntaxProvide.Growauto ?
+                        service.Growauto !== 0 ?
 
                             <div className="sytax__number" >
 
                                 Tăng tự động:
-                                <Input className="input__number" value={service.SyntaxProvide.Growauto[0]} />
+                                <Input className="input__number" value={service?.Growauto[0]} />
                                 đến
-                                <Input className="input__number" value={service.SyntaxProvide.Growauto[1]} />
+                                <Input className="input__number" value={service?.Growauto[1]} />
                             </div>
                             :
                             <></>
                     }
                     {
-                        service.SyntaxProvide.Prefix ?
+                        service.Prefix !== 0 ?
                             <div className="sytax__number">
 
                                 Prefix:
-                                <Input className="input__number" style={{ marginLeft: 65 }} value={service.SyntaxProvide.Prefix} />
+                                <Input className="input__number" style={{ marginLeft: 65 }} value={service?.Prefix} />
 
                             </div>
                             :
@@ -172,18 +153,18 @@ const DetailDervice = () => {
                     }
 
                     {
-                        service.SyntaxProvide.Surfix ?
+                        service.Surfix !== 0 ?
                             <div className="sytax__number">
 
                                 Prefix:
-                                <Input className="input__number" style={{ marginLeft: 65 }} value={service.SyntaxProvide.Surfix} />
+                                <Input className="input__number" style={{ marginLeft: 65 }} value={service?.Surfix} />
 
                             </div>
                             :
                             <></>
                     }
 
-                    {service.SyntaxProvide.Reset ?
+                    {service.Reset ?
                         <div className="sytax__number">
                             Reset mỗi ngày
                         </div>
@@ -243,10 +224,10 @@ const DetailDervice = () => {
 
                             />
                             <div className='btn_service' >
-                                <div className='update_service'>
+                                <div className='update_service' onClick={handleUpdateService}>
                                     Cập nhật danh sách
                                 </div>
-                                <div className='back'>
+                                <div className='back' onClick={handleBack}>
                                     Quay lại
                                 </div>
                             </div>

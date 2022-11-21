@@ -29,7 +29,9 @@ const AddDevice = () => {
                 deviceConnect: true,
                 detail: 'chi tiết',
                 update: 'cập nhật',
-                services: selectedItems
+                services: selectedItems,
+                username: deviceusername,
+                password: devicepassword
             })
             navigate('/device')
 

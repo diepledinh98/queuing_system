@@ -1,15 +1,16 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { stat } from "fs";
 
-type serviceProps = {
+type accountStore = {
     id?: string
-    serviceID: string;
-    serviceName: string;
-    serviceStatus: boolean
-    Growauto?: number[]
-    Prefix?: string
-    Surfix?: string
-    Reset?: boolean
+    name: string
+    image: string
+    eamil: string
+    phone: string
+    role: string
+    status: boolean
+    username: string
+    password: string
 };
 // const device = {
 //     deviceId: "",
@@ -22,32 +23,32 @@ type serviceProps = {
 // };
 interface IStore {
     statusAdd?: boolean;
-    services?: serviceProps[] | object[];
+    account?: accountStore[] | object[];
 }
 // export const fetchDevices = createAction<{
 //   devices: Array<object | undefined>;
 // }>("devices/get");
-export const addServiceInStore = createAction<{ service: object }>("services/add");
-export const serviceStore = createSlice({
-    name: "serviceStore",
+export const addAccountInStore = createAction<{ account: object }>("account/add");
+export const accountStore = createSlice({
+    name: "accountStore",
     initialState: {
         statusAdd: false,
-        services: [],
+        account: [],
     } as unknown as IStore,
     reducers: {
-        addServiceInStore: (
+        addAccountInStore: (
             state,
             action: PayloadAction<{
-                service: object;
+                account: object;
             }>
-        ) => Object.assign(state, { service: action.payload }),
+        ) => Object.assign(state, { account: action.payload }),
 
-        fetchService: (
+        fetchAccount: (
             state,
             action: PayloadAction<{
-                services: object[] | any;
+                account: object[] | any;
             }>
-        ) => Object.assign(state, { services: action.payload.services }),
+        ) => Object.assign(state, { account: action.payload.account }),
 
         // fetchDevices: (
         //   state,

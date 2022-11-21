@@ -22,151 +22,231 @@ import { useAltaIntl } from '@shared/hook/useTranslate';
 import ModalComponents from './component/MainModal/ModalHomepage';
 import { IModal } from './interface';
 import { routerHomepage } from './router';
-
+import { CalendarOutlined, LaptopOutlined } from '@ant-design/icons';
+import { Area } from '@ant-design/plots';
+import { Select, Progress, Calendar } from 'antd';
 const dataTable = require('./data.json');
-
+const { Option, OptGroup } = Select;
 const Homepage = () => {
   const { formatMessage } = useAltaIntl();
-  const table = useTable();
 
-  const [modal, setModal] = useState<IModal>({
-    isVisible: false,
-    dataEdit: null,
-    isReadOnly: false,
-  });
-  const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
-  const [search, setSearch] = useState<string>('');
-  const [filter, setFilterOption] = useState<any>();
-
-  const idChooses = 'id'; //get your id here. Ex: accountId, userId,...
-  const columns: ColumnsType = [
-    {
-      dataIndex: 'tagName',
-    },
-    {
-      dataIndex: 'lastUpdate',
-    },
-    {
-      dataIndex: 'group',
-    },
-    {
-      dataIndex: 'group',
-      render: () => <CircleLabel text={formatMessage('common.statusActive')} colorCode="blue" />,
-    },
-    {
-      dataIndex: 'action',
-      render: (_item: any, record: any) => (
-        <Space>
-          <EditIconComponent
-            onClick={() => {
-              setModal({
-                dataEdit: record,
-                isVisible: true,
-                isReadOnly: false,
-              });
-            }}
-          />
-          <InformationIconComponent
-            onClick={() => {
-              setModal({
-                dataEdit: record,
-                isVisible: true,
-                isReadOnly: true,
-              });
-            }}
-          />
-        </Space>
-      ),
-    },
-  ];
-
-  const handleRefresh = () => {
-    table.fetchData({ option: { search: search, filter: { ...filter } } });
-    setSelectedRowKeys([]);
-  };
-
-  const arrayAction: IArrayAction[] = [
-    {
-      iconType: 'add',
-      handleAction: () => {
-        setModal({ dataEdit: null, isVisible: true });
-      },
-    },
-    { iconType: 'share' },
-    {
-      iconType: 'delete',
-      disable: selectedRowKeys?.length === 0,
-      handleAction: () => {
-        DeleteConfirm({
-          content: formatMessage('common.delete'),
-          handleOk: () => {
-            // call Api Delete here
-            handleRefresh();
-          },
-          handleCancel: () => {},
-        });
-      },
-    },
-  ];
-  const dataString: ISelect[] = [{ label: 'common.all', value: undefined }];
-  const arraySelectFilter: ISelectAndLabel[] = [
-    { textLabel: 'Lĩnh vực', dataString },
-    { textLabel: 'Địa bàn quản lý', dataString },
-    { textLabel: 'Trạng thái', dataString },
-  ];
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    table.fetchData({ option: { search: search, filter: { ...filter } } });
-  }, [search, filter, table]);
+    asyncFetch();
+  }, []);
 
-  const handleSearch = (searchKey: string) => {
-    setSearch(searchKey);
+  const asyncFetch = () => {
+    fetch('https://gw.alipayobjects.com/os/bmw-prod/360c3eae-0c73-46f0-a982-4746a6095010.json')
+      .then((response) => response.json())
+      .then((json) => setData(json))
+      .catch((error) => {
+        console.log('fetch data failed', error);
+      });
+  };
+  const config = {
+    data,
+    xField: 'timePeriod',
+    yField: 'value',
+    xAxis: {
+      range: [0, 1],
+    },
   };
 
-  const onChangeSelectStatus = (name: string | undefined) => (status: any) => {
-    if (name && status) {
-      setFilterOption((pre: any) => ({ ...pre, [name]: status }));
-    }
-  };
   return (
     <div className="homepage">
-      <MainTitleComponent breadcrumbs={routerHomepage} />
-      <div className="main-card">
-        <div className="d-flex flex-row justify-content-md-between mb-3 align-items-end">
-          <div className="d-flex flex-row ">
-            {arraySelectFilter.map(item => (
-              <SelectAndLabelComponent
-                onChange={onChangeSelectStatus(item.name)}
-                key={item.name}
-                className="margin-select"
-                dataString={item.dataString}
-                textLabel={item.textLabel}
-              />
-            ))}
+      <div className='homepage_left'>
+        <MainTitleComponent breadcrumbs={routerHomepage} />
+
+        <div className='title'>
+          Biểu đồ cấp số
+        </div>
+        <div className='list_graph'>
+          <div className='graph_item'>
+            <div className='name'>
+              <div className='border_icon'>
+                <CalendarOutlined className='icon' />
+              </div>
+              Số thứ tự <br /> đã cấp
+            </div>
+            <div className='number'>
+              4.221
+            </div>
           </div>
-          <div className="d-flex flex-column ">
-            <div className="label-select">{formatMessage('common.keyword')}</div>
-            <SearchComponent
-              onSearch={handleSearch}
-              placeholder={'common.keyword'}
-              classNames="mb-0 search-table"
-            />
+          <div className='graph_item'>
+            <div className='name'>
+              <div className='border_icon'>
+                <CalendarOutlined className='icon' />
+              </div>
+              Số thứ tự <br /> đã cấp
+            </div>
+            <div className='number'>
+              4.221
+            </div>
+          </div>
+          <div className='graph_item'>
+            <div className='name'>
+              <div className='border_icon'>
+                <CalendarOutlined className='icon' />
+              </div>
+              Số thứ tự <br /> đã cấp
+            </div>
+            <div className='number'>
+              4.221
+            </div>
+          </div>
+          <div className='graph_item'>
+            <div className='name'>
+              <div className='border_icon'>
+                <CalendarOutlined className='icon' />
+              </div>
+              Số thứ tự <br /> đã cấp
+            </div>
+            <div className='number'>
+              4.221
+            </div>
           </div>
         </div>
-        <TableComponent
-          // apiServices={}
-          defaultOption={filter}
-          translateFirstKey="homepage"
-          rowKey={res => res[idChooses]}
-          register={table}
-          columns={columns}
-          onRowSelect={setSelectedRowKeys}
-          dataSource={dataTable}
-          disableFirstCallApi={true}
-        />
+
+
+        <div className='chart_info'>
+          <div className='info'>
+            <div className='date'>
+              Bảng thống kê <br />
+              <span>
+                Tháng 11/2021
+              </span>
+            </div>
+            <div className='select'>
+              Xem theo
+              <Select defaultValue="Ngày">
+                <Option>Ngày</Option>
+                <Option>Tuần</Option>
+                <Option>Tháng</Option>
+                <Option>Năm</Option>
+              </Select>
+            </div>
+          </div>
+          <div className='chart'>
+
+            <Area {...config} />
+          </div>
+        </div>
       </div>
-      <RightMenu arrayAction={arrayAction} />
-      <ModalComponents modal={modal} handleRefresh={handleRefresh} setModal={setModal} />
+      <div className='homepage_right'>
+        <div className='title_right'>
+          Tổng quan
+        </div>
+        <div className='tq_item'>
+          <div className='progress1'>
+            <Progress type="circle" percent={90} className="device_out" />
+            <Progress type="circle" percent={30} className="device_in" />
+          </div>
+          <div className='tq_name'>
+            4.221
+            <span>
+              <LaptopOutlined />
+              Thiết bị
+            </span>
+          </div>
+          <div className='tq_info'>
+            <div className='tq_info_item'>
+              <div className='dot' style={{ backgroundColor: '#FF7506' }}></div>
+              <div className='info_item_name'>
+                Đang hoạt động
+              </div>
+              <div className='info_item_number'>
+                3.799
+              </div>
+            </div>
+            <div className='tq_info_item'>
+              <div className='dot' style={{ backgroundColor: '#7E7D88' }}></div>
+              <div className='info_item_name'>
+                Ngưng hoạt động
+              </div>
+              <div className='info_item_number'>
+                422
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className='tq_item'>
+          <div className='progress1'>
+            <Progress type="circle" percent={90} className="device_out" />
+            <Progress type="circle" percent={30} className="device_in" />
+          </div>
+          <div className='tq_name'>
+            4.221
+            <span>
+              <LaptopOutlined />
+              Thiết bị
+            </span>
+          </div>
+          <div className='tq_info'>
+            <div className='tq_info_item'>
+              <div className='dot' style={{ backgroundColor: '#FF7506' }}></div>
+              <div className='info_item_name'>
+                Đang hoạt động
+              </div>
+              <div className='info_item_number'>
+                3.799
+              </div>
+            </div>
+            <div className='tq_info_item'>
+              <div className='dot' style={{ backgroundColor: '#7E7D88' }}></div>
+              <div className='info_item_name'>
+                Ngưng hoạt động
+              </div>
+              <div className='info_item_number'>
+                422
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className='tq_item'>
+          <div className='progress1'>
+            <Progress type="circle" percent={90} className="device_out" />
+            <Progress type="circle" percent={30} className="device_in" />
+          </div>
+          <div className='tq_name'>
+            4.221
+            <span>
+              <LaptopOutlined />
+              Thiết bị
+            </span>
+          </div>
+          <div className='tq_info'>
+            <div className='tq_info_item'>
+              <div className='dot' style={{ backgroundColor: '#FF7506' }}></div>
+              <div className='info_item_name'>
+                Đang hoạt động
+              </div>
+              <div className='info_item_number'>
+                3.799
+              </div>
+            </div>
+            <div className='tq_info_item'>
+              <div className='dot' style={{ backgroundColor: '#7E7D88' }}></div>
+              <div className='info_item_name'>
+                Ngưng hoạt động
+              </div>
+              <div className='info_item_number'>
+                422
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div className="site-calendar-demo-card">
+          <Calendar fullscreen={false} />
+        </div>
+      </div>
+
+
     </div>
   );
 };

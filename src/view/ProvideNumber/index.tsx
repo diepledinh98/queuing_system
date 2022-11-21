@@ -22,23 +22,60 @@ import { useAltaIntl } from '@shared/hook/useTranslate';
 
 import { IModal } from '../Homepage/interface';
 import { routerViewProvideNumber } from './router';
-
+import { useAppDispatch, useAppSelector } from '@shared/hook/reduxhook';
+import { provideNumberStore } from '@modules/providenumber/numberStore';
+import { getProvideNumber } from '@modules/providenumber/respository';
+import { Item } from '@antv/g6-core';
 const dataTable = require('./dataprovidenumber.json');
 
+interface DataType {
+    id?: string
+    number?: string
+    customerName?: string
+    serviceName?: string
+    GrantTime?: string
+    expiry?: string
+    status?: string
+    powerSupply?: string
+}
+
+let data: DataType[] | any;
 const ProvideNumber = () => {
     const { formatMessage } = useAltaIntl();
     const table = useTable();
 
-    const [modal, setModal] = useState<IModal>({
-        isVisible: false,
-        dataEdit: null,
-        isReadOnly: false,
-    });
+    const idChooses = 'id';
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
     const [search, setSearch] = useState<string>('');
     const [filter, setFilterOption] = useState<any>();
     const navigate = useNavigate();
-    const idChooses = 'id'; //get your id here. Ex: accountId, userId,...
+    const dispatch = useAppDispatch()
+    const providenumber = useAppSelector((state) => state.providenumber.providenumber)
+    data = providenumber?.map((item, index) => {
+        console.log(item.service.serviceName);
+
+        return {
+            id: item?.id,
+            number: item?.stt,
+            customerName: 'Nguyen Van A',
+            serviceName: item.service.serviceName,
+            GrantTime: item?.timeprovide,
+            expiry: item?.dateduse,
+            status: item?.status,
+            powerSupply: 'Kiosk'
+        }
+    })
+    useEffect(() => {
+        getProvideNumber().then((providenumberSnap) => {
+            dispatch(provideNumberStore.actions.fetchprovidenumber({ providenumber: providenumberSnap }))
+        });
+
+
+    }, []);
+
+    const onDetail = (id: string) => {
+        navigate(`/detailnumber/${id}`)
+    }
     const columns: ColumnsType = [
         {
             title: 'STT',
@@ -67,7 +104,16 @@ const ProvideNumber = () => {
         {
             title: 'Trạng thái',
             dataIndex: 'status',
-            render: () => <CircleLabel text={formatMessage('common.statusActive')} colorCode="green" />,
+            render: (status: string) => (
+                <>
+                    {status == 'waiting' ? <CircleLabel text={formatMessage('common.statuswaiting')} colorCode="blue" /> : (
+                        status == 'used' ? <CircleLabel text={formatMessage('common.statusNotActive')} colorCode="red" /> :
+                            <CircleLabel text={formatMessage('common.statusNotActive')} colorCode="red" />
+                    )
+
+                    }
+                </>
+            )
         },
 
         {
@@ -77,42 +123,28 @@ const ProvideNumber = () => {
         {
             title: 'Chi tiết',
             dataIndex: 'detail',
+            render: (action: any, record: any) => {
+
+
+                return (
+                    <>
+                        <a
+                            onClick={() => onDetail(record.id)}
+                            style={{ textDecoration: "underline", color: "#4277FF", }}
+                        >Chi tiết</a>
+                    </>
+
+                )
+            }
         }
     ];
 
 
     const linkAddDevice = () => {
-        navigate('/AddDevice');
+        navigate('/addprovide');
     }
 
-    const handleRefresh = () => {
-        table.fetchData({ option: { search: search, filter: { ...filter } } });
-        setSelectedRowKeys([]);
-    };
 
-    const arrayAction: IArrayAction[] = [
-        {
-            iconType: 'add',
-            handleAction: () => {
-                setModal({ dataEdit: null, isVisible: true });
-            },
-        },
-        { iconType: 'share' },
-        {
-            iconType: 'delete',
-            disable: selectedRowKeys?.length === 0,
-            handleAction: () => {
-                DeleteConfirm({
-                    content: formatMessage('common.delete'),
-                    handleOk: () => {
-                        // call Api Delete here
-                        handleRefresh();
-                    },
-                    handleCancel: () => { },
-                });
-            },
-        },
-    ];
     const dataString: ISelect[] = [{ label: 'common.all', value: undefined }, { label: 'common.onaction', value: undefined }, { label: 'common.stopaction', value: undefined }];
 
     const arraySelectFilter: ISelectAndLabel[] = [
@@ -120,9 +152,7 @@ const ProvideNumber = () => {
 
     ];
 
-    useEffect(() => {
-        table.fetchData({ option: { search: search, filter: { ...filter } } });
-    }, [search, filter, table]);
+
 
     const handleSearch = (searchKey: string) => {
         setSearch(searchKey);
@@ -169,12 +199,12 @@ const ProvideNumber = () => {
                         register={table}
                         columns={columns}
                         // onRowSelect={setSelectedRowKeys}
-                        dataSource={dataTable}
+                        dataSource={data}
                         bordered
                         disableFirstCallApi={true}
                     />
                     <div className='btn_add_device' onClick={linkAddDevice}>
-                        Thêm dịch vụ
+                        Cấp số mới
                     </div>
                 </div>
             </div>

@@ -7,11 +7,46 @@
     box-shadow: 0px 0px 6px #E7E9F2;
     border-radius: 8px 0px 0px 8px;
     color: #FF7506;
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: 500;
+
     padding: 0 12px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
+}
+
+.ant-pagination {
+    margin-top: 60px;
+    margin-left: 900px;
+
+    .ant-pagination-prev,
+    .ant-pagination-next {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+        font-weight: 500;
+        background-color: transparent;
+        border: none;
+        color: #7E7D88;
+    }
+
+    .ant-pagination-item {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+        font-weight: 500;
+        background-color: transparent;
+        border: none;
+        color: #7E7D88;
+    }
+
+    .ant-pagination-item-active {
+        background: #FF7506;
+        border-radius: 4px;
+
+
+        color: #FFFFFF;
+        border-color: transparent;
+    }
 }

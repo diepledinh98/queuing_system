@@ -41,8 +41,8 @@ const HeaderComponent = () => {
           }}
         >
           <h4 className="identify__admin">{profile?.userFullName}</h4>
-          <p className="identify__place">{profile?.email || 'Unknown'}</p>
-          <p className="identify__hi">{(profile && profile?.role?.roleName) || 'Unknown'}</p>
+          <p className="identify__place">{profile?.email || 'Lê Đình Điệp'}</p>
+          <p className="identify__hi">{(profile && profile?.role?.roleName) || 'Kế toán'}</p>
         </div>
       </div>
     </>

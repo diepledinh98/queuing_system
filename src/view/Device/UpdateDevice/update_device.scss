@@ -1,3 +1,21 @@
+.ant-select-selection-overflow-item .ant-select-selection-item {
+    background: #FFAC6A;
+    /* down */
+    height: 28px;
+    box-shadow: 0px 0px 6px #E7E9F2;
+    border-radius: 9px;
+}
+
+.ant-select-multiple .ant-select-selection-item-content {
+    color: #FFFFFF;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.ant-select-multiple .ant-select-selection-item-remove svg {
+    color: #ffffff;
+}
+
 .update__device_page {
     .add_device {
         width: 100%;

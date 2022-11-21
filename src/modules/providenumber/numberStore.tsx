@@ -1,6 +1,5 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { stat } from "fs";
-
 type serviceProps = {
     id?: string
     serviceID: string;
@@ -10,6 +9,15 @@ type serviceProps = {
     Prefix?: string
     Surfix?: string
     Reset?: boolean
+};
+type provideNumberProps = {
+    id?: string
+    dateduse: string
+    linkServiceId: string
+    stt: number
+    timeprovide: string
+    status: string
+    service: serviceProps
 };
 // const device = {
 //     deviceId: "",
@@ -22,32 +30,32 @@ type serviceProps = {
 // };
 interface IStore {
     statusAdd?: boolean;
-    services?: serviceProps[] | object[];
+    providenumber?: provideNumberProps[] | object[];
 }
 // export const fetchDevices = createAction<{
 //   devices: Array<object | undefined>;
 // }>("devices/get");
-export const addServiceInStore = createAction<{ service: object }>("services/add");
-export const serviceStore = createSlice({
-    name: "serviceStore",
+export const addnumberInStore = createAction<{ providenumber: object }>("providenumber/add");
+export const provideNumberStore = createSlice({
+    name: "provideNumberStore",
     initialState: {
         statusAdd: false,
-        services: [],
+        providenumber: [],
     } as unknown as IStore,
     reducers: {
-        addServiceInStore: (
+        addProvideNumberInStore: (
             state,
             action: PayloadAction<{
-                service: object;
+                providenumber: object;
             }>
-        ) => Object.assign(state, { service: action.payload }),
+        ) => Object.assign(state, { providenumber: action.payload }),
 
-        fetchService: (
+        fetchprovidenumber: (
             state,
             action: PayloadAction<{
-                services: object[] | any;
+                providenumber: object[] | any;
             }>
-        ) => Object.assign(state, { services: action.payload.services }),
+        ) => Object.assign(state, { providenumber: action.payload.providenumber }),
 
         // fetchDevices: (
         //   state,
