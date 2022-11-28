@@ -18,7 +18,7 @@ import SelectAndLabelComponent, {
 import TableComponent from '@shared/components/TableComponent';
 import useTable from '@shared/components/TableComponent/hook';
 import { useAltaIntl } from '@shared/hook/useTranslate';
-
+import { fetchProvideNumber } from '@modules/providenumber/numberStore';
 
 import { IModal } from '../Homepage/interface';
 import { routerViewReport } from './router';
@@ -51,7 +51,11 @@ const Report = () => {
     const idChooses = 'id'; //get your id here. Ex: accountId, userId,...
 
     const dispatch = useAppDispatch()
-    const providenumber = useAppSelector((state) => state.providenumber.providenumber)
+    const providenumber = useAppSelector((state) => state.providenumber.Number)
+
+    useEffect(() => {
+        dispatch(fetchProvideNumber())
+    }, [dispatch])
     data = providenumber?.map((item, index) => {
 
 

@@ -26,9 +26,12 @@ import { Button, Modal } from 'antd';
 import ModalNumber from './ModalNumber';
 import { addDoc, collection } from "firebase/firestore";
 import { FirebaseConfig } from 'src/firebase/configs';
-import { useAppSelector } from '@shared/hook/reduxhook';
+import { createProvideNumber } from '@modules/providenumber/numberStore';
+import { fetchServices } from '@modules/service/serviceStore';
+import { fetchAccounts } from '@modules/account/accoutStore';
+import { useAppSelector, useAppDispatch } from '@shared/hook/reduxhook';
 
-interface NameServiceProps {
+type serviceProps = {
     id?: string
     serviceID: string;
     serviceName: string;
@@ -37,19 +40,42 @@ interface NameServiceProps {
     Prefix?: string
     Surfix?: string
     Reset?: boolean
-}
+};
+
+type accountStore = {
+    id?: string
+    name: string
+    image: string
+    eamil: string
+    phone: string
+    role: string
+    status: boolean
+    username: string
+    password: string
+};
+type provideNumberProps = {
+    id?: string
+    dateduse: string
+    linkServiceId: string
+    stt: number
+    timeprovide: string
+    status: string
+    service: serviceProps
+    customer: accountStore
+};
+
 const ProvideNumber = () => {
     const { formatMessage } = useAltaIntl();
     const db = FirebaseConfig.getInstance().fbDB
     const { Option, OptGroup } = Select;
-
+    const dispatch = useAppDispatch()
 
 
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [idService, setIdService] = useState('')
     const [stt, setStt] = useState(2001203)
-    const [sername, setSername] = useState<NameServiceProps>()
+    const [sername, setSername] = useState<provideNumberProps>()
     const navigate = useNavigate();
     var presentDate = new Date();
     var date = presentDate.getDate()
@@ -57,40 +83,61 @@ const ProvideNumber = () => {
     var year = presentDate.getFullYear()
     var hour = presentDate.getHours()
     var minutes = presentDate.getMinutes()
-    var time = `${hour}:${minutes} - ${date}/${month}/${year}`
+
+    var time = `${hour < 10 ? `0${hour}` : hour}:${minutes < 10 ? `0${minutes}` : minutes} - ${date < 10 ? `0${date}` : date}/${month < 10 ? `0${month}` : month}/${year}`
     var dated = `${hour}:${minutes} - ${date + 1}/${month}/${year}`
-    const services: Array<any> | undefined = useAppSelector((state) => {
+    const services: Array<any> = useAppSelector((state) => {
         return state.service.services
     });
 
+    const providedNumber = useAppSelector((state) => state.providenumber.providedNumber)
+    const customers: Array<accountStore> | any = useAppSelector((state) => {
+        return state.account.accounts
+    });
 
 
+    const str: number = customers?.length
+    console.log(str);
+    const indexCustomer = Math.floor(Math.random() * (str + 1))
+    console.log(indexCustomer);
+
+    useEffect(() => {
+        dispatch(fetchServices())
+        dispatch(fetchAccounts())
+    }, [])
     const handleChange = (value: string) => {
         setIdService(value)
 
     };
     const showModal = async () => {
 
-        try {
-            var nameservice = services?.find((item) => item.id == idService);
-            setSername(nameservice)
+
+        var nameservice = services?.find((item) => item.id == idService);
+        setSername(nameservice)
 
 
-            const docRef = await addDoc(collection(db, 'providenumber'), {
-                linkServiceId: idService,
-                status: 'waiting',
-                stt: 2001203,
-                timeprovide: time,
-                dateduse: dated,
-                service: nameservice
-            })
+        // const docRef = await addDoc(collection(db, 'providenumber'), {
+        //     linkServiceId: idService,
+        //     status: 'waiting',
+        //     stt: providedNumber,
+        //     timeprovide: time,
+        //     dateduse: dated,
+        //     service: nameservice
+        // })
 
 
+
+        const body: provideNumberProps = {
+            linkServiceId: idService,
+            status: 'waiting',
+            stt: providedNumber,
+            timeprovide: time,
+            dateduse: dated,
+            service: nameservice,
+            customer: customers[indexCustomer]
         }
-        catch (e) {
-            console.log(e);
+        dispatch(createProvideNumber(body))
 
-        }
         setOpen(true);
 
     };
@@ -141,16 +188,16 @@ const ProvideNumber = () => {
                 <div className='modal_provide'>
                     <div className='content'>
                         <div className='title'>Số thứ tự được câp</div>
-                        <div className='number'>{stt}</div>
-                        <div className='service'>{sername?.serviceName} <span>(Tại quầy số 1)</span></div>
+                        <div className='number'>{providedNumber - 1}</div>
+                        <div className='service'> <span>(Tại quầy số 1)</span></div>
                     </div>
 
                 </div>
 
                 <div className='footer'>
                     <div className='time'>
-                        <div className=''>Thời gian cấp: 27362764723</div>
-                        <div className=''>Hạn sử dụng: 4324424424</div>
+                        <div className=''>Thời gian cấp: {time}</div>
+                        <div className=''>Hạn sử dụng: {dated}</div>
                     </div>
                 </div>
 

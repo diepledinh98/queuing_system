@@ -7,16 +7,30 @@ import { addDoc, collection } from "firebase/firestore";
 import { FirebaseConfig } from 'src/firebase/configs';
 import { async } from '@firebase/util';
 import { useNavigate } from 'react-router';
+import { createAccount } from '@modules/account/accoutStore';
+import { useAppDispatch } from '@shared/hook/reduxhook';
 const { Option } = Select;
 const db = FirebaseConfig.getInstance().fbDB
+
+type accountStore = {
+    id?: string
+    name: string
+    image: string
+    email: string
+    phone: string
+    role: string
+    status: string
+    username: string
+    password: string
+};
 const AddAccount = () => {
     const navigate = useNavigate()
-
+    const dispatch = useAppDispatch()
     const [name, setName] = useState('')
     const [username, setUsername] = useState('')
     const [phone, setPhone] = useState('')
     const [password, setPassword] = useState('')
-    const [eamil, setEmail] = useState('')
+    const [email, setEmail] = useState('')
     const [againPassword, setAgainPassword] = useState('')
     const [role, setRole] = useState('')
     const [status, setStatus] = useState('')
@@ -31,8 +45,18 @@ const AddAccount = () => {
 
     const handleAddAccount = async () => {
         try {
-            const docRef = await addDoc(collection(db, 'users'), {
-                email: eamil,
+            // const docRef = await addDoc(collection(db, 'users'), {
+            //     email: eamil,
+            //     image: 'https://cdn.pixabay.com/photo/2013/05/11/20/44/spring-flowers-110671_960_720.jpg',
+            //     name: 'customer',
+            //     password: password,
+            //     phone: phone,
+            //     role: role,
+            //     status: status,
+            //     username: username
+            // })
+            const body: accountStore = {
+                email: email,
                 image: 'https://cdn.pixabay.com/photo/2013/05/11/20/44/spring-flowers-110671_960_720.jpg',
                 name: 'customer',
                 password: password,
@@ -40,8 +64,8 @@ const AddAccount = () => {
                 role: role,
                 status: status,
                 username: username
-            })
-
+            }
+            dispatch(createAccount(body))
             navigate('/setting/manage/account')
         }
         catch (e) {

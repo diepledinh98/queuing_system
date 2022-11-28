@@ -22,10 +22,8 @@ import { useAltaIntl } from '@shared/hook/useTranslate';
 import './style.scss'
 import { IModal } from '../Homepage/interface';
 import { routerViewService } from './router';
-import { serviceStore } from '@modules/service/serviceStore';
-import { getServices } from '@modules/service/respository';
 import { useAppDispatch, useAppSelector } from '@shared/hook/reduxhook';
-const dataTable = require('./dataservice.json');
+import { fetchServices } from '@modules/service/serviceStore';
 
 const Service = () => {
     const { formatMessage } = useAltaIntl();
@@ -44,10 +42,11 @@ const Service = () => {
     const dispatch = useAppDispatch()
     const services = useAppSelector((state) => state.service.services)
     useEffect(() => {
-        getServices().then((serviceSnap) => {
-            dispatch(serviceStore.actions.fetchService({ services: serviceSnap }))
-        });
-    }, []);
+        // getServices().then((serviceSnap) => {
+        //     dispatch(serviceStore.actions.fetchService({ services: serviceSnap }))
+        // });
+        dispatch(fetchServices())
+    }, [dispatch]);
 
     const onDetail = (id: string) => {
         navigate(`/detailservice/${id}`)

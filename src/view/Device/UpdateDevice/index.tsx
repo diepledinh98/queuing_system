@@ -5,20 +5,47 @@ import { Avatar, Col, Row, Input, Select } from 'antd';
 import './update_device.scss'
 import { useParams } from 'react-router';
 import { useState } from 'react';
-import { useAppSelector } from '@shared/hook/reduxhook';
+import { useAppSelector, useAppDispatch } from '@shared/hook/reduxhook';
 import { async } from '@firebase/util';
 import { FirebaseConfig } from 'src/firebase/configs';
 import { doc, updateDoc } from "firebase/firestore";
+import { updateDevice } from '@modules/devicenew/devicenewStore';
 import { useNavigate } from 'react-router';
+import { createHistorys } from '@modules/history/historyStore';
+import { onAuthStateChanged } from 'firebase/auth'
+interface deviceProps {
+    id?: string
+    deviceID: string;
+    deviceName: string;
+    deviceIP: string;
+    deviceStatus: boolean
+    deviceConnect: boolean
+    services: string[]
+    detail: string
+    update: string
+    username: string
+    password: string
+};
+interface historyProps {
+    id?: string
+    username: string
+    time: string
+    IP: string
+    action: string
+}
+interface AuthUser {
+    email: string,
+}
 const UpdateDevice = () => {
     const db = FirebaseConfig.getInstance().fbDB
+    const auth = FirebaseConfig.getInstance().auth
     const idd = useParams()
     let id: any = idd.id
     const devices: Array<any> | undefined = useAppSelector((state) => {
-        return state.device.devices;
+        return state.devicenew.devices;
     });
     const navigate = useNavigate();
-
+    const dispatch = useAppDispatch()
     const device = devices?.find((value) => value.id == id);
     const OPTIONS = ['Khám tim mạch', 'Khám sản - Phụ khoa', 'Khám răng hàm mặt', 'Khám tai mũi họng', 'Khám hô hấp', 'Khám tổng quát'];
     const [selectedItems, setSelectedItems] = useState<string[]>(device.services);
@@ -29,29 +56,47 @@ const UpdateDevice = () => {
     const [username, setUsername] = useState(device.username)
     const [password, setPassword] = useState(device.password)
     const filteredOptions = OPTIONS.filter(o => !selectedItems.includes(o));
+    const [usercurrent, setUsercurrent] = useState<AuthUser | any>(null)
 
-    // useEffect(() => {
-    //     setSelectedItems(device.services)
-    //     setDeviceName(device.deviceName)
-    // }, [])
+    var presentDate = new Date();
+    var date = presentDate.getDate()
+    var month = presentDate.getMonth()
+    var year = presentDate.getFullYear()
+    var hour = presentDate.getHours()
+    var minutes = presentDate.getMinutes()
+    var seconds = presentDate.getSeconds()
+    var time = ` ${date}/${month}/${year} ${hour}:${minutes}:${seconds}`
+    useEffect(() => {
+        onAuthStateChanged(auth, (curr: any) => {
+            setUsercurrent(curr)
+        })
+    }, [])
     const HandleCancel = () => {
         navigate('/device')
     }
     const HandleUpdate = async () => {
-        const deviceNeedUpdate = doc(db, "devices", id);
-        const dataUpdate = {
+
+        const idDevice = id
+        const body: deviceProps = {
             deviceIP: deviceIP,
             deviceName: deviceName,
             deviceID: deviceId,
             deviceStatus: true,
             deviceConnect: true,
-            username: username,
-            password: password,
             detail: 'chi tiết',
             update: 'cập nhật',
-            services: selectedItems
+            services: selectedItems,
+            username: username,
+            password: password
         }
-        await updateDoc(deviceNeedUpdate, dataUpdate)
+        const bodyHistory: historyProps = {
+            username: usercurrent?.email,
+            time: time,
+            IP: '192.168.1.10',
+            action: `Cập nhật thông tin thiết bị ${deviceName} `
+        }
+        dispatch(createHistorys(bodyHistory))
+        dispatch(updateDevice({ idDevice, body }))
         navigate('/device')
     }
 

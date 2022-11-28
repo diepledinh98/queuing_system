@@ -25,14 +25,40 @@ import { useAppSelector } from '@shared/hook/reduxhook';
 import { routerViewUpdateService } from './router';
 import { async } from '@firebase/util';
 import { FirebaseConfig } from 'src/firebase/configs';
+import { updateService } from '@modules/service/serviceStore';
+import { useAppDispatch } from '@shared/hook/reduxhook';
 import { doc, updateDoc } from "firebase/firestore";
 
+import { createHistorys } from '@modules/history/historyStore';
+import { onAuthStateChanged } from 'firebase/auth'
+interface historyProps {
+    id?: string
+    username: string
+    time: string
+    IP: string
+    action: string
+}
+type serviceProps = {
+    id?: string
+    serviceID: string;
+    serviceName: string;
+    serviceStatus: boolean
+    description: string
+    Growauto?: number | string[]
+    Prefix?: string | number
+    Surfix?: string | number
+    Reset?: boolean | number
+};
+interface AuthUser {
+    email: string,
+}
 const { TextArea } = Input;
 const UpdateService = () => {
     const db = FirebaseConfig.getInstance().fbDB
+    const auth = FirebaseConfig.getInstance().auth
     const { formatMessage } = useAltaIntl();
     const navigate = useNavigate();
-
+    const dispatch = useAppDispatch()
     const idd = useParams()
     let id: any = idd.id
 
@@ -52,7 +78,17 @@ const UpdateService = () => {
     const [surfix, setSurfix] = useState(false)
     const [numberSurfix, setNumberSurfix] = useState(service.Surfix)
     const [reset, setReset] = useState(service.Reset)
+    const [usercurrent, setUsercurrent] = useState<AuthUser | any>(null)
 
+
+    var presentDate = new Date();
+    var date = presentDate.getDate()
+    var month = presentDate.getMonth()
+    var year = presentDate.getFullYear()
+    var hour = presentDate.getHours()
+    var minutes = presentDate.getMinutes()
+    var seconds = presentDate.getSeconds()
+    var time = ` ${date}/${month}/${year} ${hour}:${minutes}:${seconds}`
 
     useEffect(() => {
         if (service.Growauto !== 0) {
@@ -64,12 +100,16 @@ const UpdateService = () => {
         if (service.Surfix !== 0) {
             setSurfix(true)
         }
-
+        onAuthStateChanged(auth, (curr: any) => {
+            setUsercurrent(curr)
+        })
     }, [])
 
     const hanldeUpdateservice = async () => {
-        const deviceNeedUpdate = doc(db, "services", id);
-        const dataUpdate = {
+
+
+        const idService = id
+        const body: serviceProps = {
             serviceID: serviceID,
             serviceName: serviceName,
             description: description,
@@ -79,7 +119,15 @@ const UpdateService = () => {
             Surfix: (surfix ? numberSurfix : 0),
             Reset: reset
         }
-        await updateDoc(deviceNeedUpdate, dataUpdate)
+        const bodyHistory: historyProps = {
+            username: usercurrent?.email,
+            time: time,
+            IP: '192.168.1.10',
+            action: `Cập nhật thông tin dịch vụ ${serviceName}`
+        }
+
+        dispatch(createHistorys(bodyHistory))
+        dispatch(updateService({ idService, body }))
         navigate('/service')
     }
 

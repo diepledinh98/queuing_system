@@ -7,13 +7,17 @@ import { deviceStore } from './device/deviceStore';
 import { serviceStore } from './service/serviceStore';
 import { provideNumberStore } from './providenumber/numberStore';
 import { accountStore } from './account/accoutStore';
+import { DeviceNewStore } from './devicenew/devicenewStore';
+import { historyStore } from './history/historyStore';
 const appReducer = combineReducers({
   profile: profileStore.reducer,
   settingStore: settingStore.reducer,
   device: deviceStore.reducer,
   service: serviceStore.reducer,
   providenumber: provideNumberStore.reducer,
-  account: accountStore.reducer
+  account: accountStore.reducer,
+  devicenew: DeviceNewStore.reducer,
+  history: historyStore.reducer
 });
 
 export type RootState = ReturnType<typeof appReducer>;

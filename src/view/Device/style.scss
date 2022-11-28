@@ -1,9 +1,11 @@
 .btn_add_device {
-    width: 80px;
+    display: flex;
+    flex-direction: column;
+    width: 120px;
     height: 94px;
     background: #FFF2E7;
     /* down */
-    margin-left: 17px;
+    margin: 0 10px;
     box-shadow: 0px 0px 6px #E7E9F2;
     border-radius: 8px 0px 0px 8px;
     color: #FF7506;

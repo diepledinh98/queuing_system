@@ -1,11 +1,13 @@
 import { IRouter } from '@routers/interface';
-
+import React from 'react';
+import { IconSetting } from '@shared/components/iconsComponent';
 export const routerViewSetting: IRouter = {
     path: '/setting',
     name: 'common.setting.system',
     loader: import('./index'),
     exact: true,
     menu: {
+        icon: <IconSetting />,
         'exact': true,
         activePath: /setting/i,
         'hideInNavbar': false
@@ -14,7 +16,7 @@ export const routerViewSetting: IRouter = {
         {
             path: '/setting/manage/role',
             name: 'common.manage.role',
-            loader: import('./manage/RoleManage'),
+            loader: import('./manage/Role/RoleManage'),
             exact: true,
             menu: {
                 'exact': true,

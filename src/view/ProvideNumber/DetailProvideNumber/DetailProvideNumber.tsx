@@ -12,7 +12,7 @@ const DetailProvideNumber = () => {
     const { id } = useParams()
 
     const providenumber: Array<any> | undefined = useAppSelector((state) => {
-        return state.providenumber.providenumber
+        return state.providenumber.Number
     });
     const provide = providenumber?.find((value) => value.id == id);
     return (
@@ -35,7 +35,7 @@ const DetailProvideNumber = () => {
                                 <Col span={12}>
                                     <Row>
                                         <Col flex="130px" className="text__info_name">Họ tên:</Col>
-                                        <Col flex="auto" className="text__info">Nguyen Van A</Col>
+                                        <Col flex="auto" className="text__info">{provide.customer.username}</Col>
                                     </Row>
                                 </Col>
 
@@ -77,7 +77,7 @@ const DetailProvideNumber = () => {
                                 <Col span={12}>
                                     <Row>
                                         <Col flex="130px" className="text__info_name">Số điện thoại:</Col>
-                                        <Col flex="auto" className="text__info">0394006075</Col>
+                                        <Col flex="auto" className="text__info">{provide.customer.phone}</Col>
                                     </Row>
                                 </Col>
 
@@ -94,7 +94,7 @@ const DetailProvideNumber = () => {
                                 <Col span={12}>
                                     <Row>
                                         <Col flex="130px" className="text__info_name">Địa chỉ Email:</Col>
-                                        <Col flex="auto" className="text__info">nguyen van A</Col>
+                                        <Col flex="auto" className="text__info">{provide.customer.email}</Col>
                                     </Row>
                                 </Col>
 

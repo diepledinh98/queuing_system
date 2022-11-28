@@ -1,60 +1,85 @@
-import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { stat } from "fs";
+import { createAction, createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
+import { collection, doc, addDoc, getDocs, updateDoc, setDoc, where } from "firebase/firestore";
+import { FirebaseConfig } from "src/firebase/configs";
+
+const db = FirebaseConfig.getInstance().fbDB
 type serviceProps = {
     id?: string
     serviceID: string;
     serviceName: string;
     serviceStatus: boolean
-    Growauto?: number[]
-    Prefix?: string
-    Surfix?: string
-    Reset?: boolean
+    description: string
+    Growauto?: number | string[]
+    Prefix?: string | number
+    Surfix?: string | number
+    Reset?: boolean | number
 };
-// const device = {
-//     deviceId: "",
-//     deviceName: "",
-//     deviceIp: "",
-//     deviceType: "",
-//     deviceNameToLogin: "",
-//     devicePassword: "",
-//     deviceService: "",
-// };
-interface IStore {
-    statusAdd?: boolean;
-    services?: serviceProps[] | object[];
+
+interface Services {
+    services: serviceProps[]
 }
-// export const fetchDevices = createAction<{
-//   devices: Array<object | undefined>;
-// }>("devices/get");
-export const addServiceInStore = createAction<{ service: object }>("services/add");
+const initialState: Services = {
+    services: []
+}
+
+export const fetchServices = createAsyncThunk("newdevice/fetchservices", async (thunkAPI) => {
+    let services: Array<undefined | object> = [];
+    const q = collection(db, "services");
+
+    const querySnapshot = await getDocs(q);
+
+    let id: string
+    querySnapshot.forEach((doc) => {
+        // doc.data() is never undefined for query doc snapshots
+        // console.log(doc.id, " => ", doc.data());
+        id = doc.id
+        services.push({ id, ...doc.data() });
+    });
+
+    return services as Array<serviceProps>;
+})
+
+
+export const createService = createAsyncThunk("serviceStore/createservice", async (body: Omit<serviceProps, 'id'>, thunkAPI) => {
+    addDoc(collection(db, 'services'), {
+        ...body
+    })
+    return {
+
+        ...body,
+    } as serviceProps;
+})
+
+export const updateService = createAsyncThunk("serviceStore/updateservice", async ({ idService, body }: { idService: string, body: serviceProps }, thunkAPI) => {
+    const serviceNeedUpdate = doc(db, "services", idService);
+    updateDoc(serviceNeedUpdate, { ...body })
+    return {
+        ...body,
+    } as serviceProps;
+})
 export const serviceStore = createSlice({
     name: "serviceStore",
-    initialState: {
-        statusAdd: false,
-        services: [],
-    } as unknown as IStore,
+    initialState,
     reducers: {
-        addServiceInStore: (
-            state,
-            action: PayloadAction<{
-                service: object;
-            }>
-        ) => Object.assign(state, { service: action.payload }),
 
-        fetchService: (
-            state,
-            action: PayloadAction<{
-                services: object[] | any;
-            }>
-        ) => Object.assign(state, { services: action.payload.services }),
-
-        // fetchDevices: (
-        //   state,
-        //   action: PayloadAction<{ devices: Array<object | undefined> }>
-        // ) => {
-        //   console.log(action.payload.devices, "instore devie nônnoo");
-        //   return Object.assign(state, { devices: action.payload.devices });
-        // },
+    },
+    extraReducers(builder) {
+        builder
+            .addCase(fetchServices.fulfilled, (state, action) => {
+                state.services = action.payload
+            })
+            .addCase(createService.fulfilled, (state, action) => {
+                state.services.push(action.payload)
+            })
+            .addCase(updateService.fulfilled, (state, action) => {
+                state.services.find((service, index) => {
+                    if (service.id === action.payload.id) {
+                        state.services[index] = action.payload
+                        return true
+                    }
+                    return false
+                })
+            })
     },
 });

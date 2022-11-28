@@ -7,7 +7,7 @@ import storage from 'redux-persist/lib/storage';
 
 import CONFIG from '@config/index';
 import appReducer, { RootState } from '@modules/index';
-
+import thunk from "redux-thunk"
 const profile = createWhitelistFilter('profile', ['token', 'remember']);
 const settingStore = createWhitelistFilter('settingStore', ['language']);
 const persistConfig: PersistConfig<RootState> = {
@@ -23,7 +23,7 @@ const middleware: any = [];
 if (process.env.NODE_ENV === 'development') {
   middleware.push(logger);
 }
-const store = createStore(persistedReducer, applyMiddleware(...middleware));
+const store = createStore(persistedReducer, applyMiddleware(...middleware, thunk));
 export const persistor = persistStore(store);
 
 export default store;

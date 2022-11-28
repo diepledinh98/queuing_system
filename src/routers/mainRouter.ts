@@ -20,9 +20,10 @@ import { routerViewAddProvideNumber } from '@view/ProvideNumber/AddProvideNumber
 import { routerAddAccount } from '@view/SettingSystem/manage/Account/AddCount/router';
 import { routerUpdateAccount } from '@view/SettingSystem/manage/Account/UpdateAccount/router';
 import { routerViewDetailProvideNumber } from '@view/ProvideNumber/DetailProvideNumber/router';
+import { routerViewAddRole } from '@view/SettingSystem/manage/Role/AddRole/router';
 export const privatePage: IRouter[] = [routerViewRoot, routerHomepage, routerViewProfile, routerViewAddDevice, routerViewDevice, routerViewDetailDevice,
     routerViewReport, routerViewProvideNumber, routerViewService, routerViewSetting, routerViewUpdateDevice, routerViewAddService, routerViewDetailService,
-    routerViewUpdateService, routerViewAddProvideNumber, routerAddAccount, routerUpdateAccount, routerViewDetailProvideNumber
+    routerViewUpdateService, routerViewAddProvideNumber, routerAddAccount, routerUpdateAccount, routerViewDetailProvideNumber, routerViewAddRole
 ];
 
 export const publicPage: IRouter[] = [routerLogin, routerForgotPassword];

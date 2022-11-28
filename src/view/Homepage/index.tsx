@@ -1,6 +1,6 @@
 import './style.scss';
 
-import { Space } from 'antd';
+import { Space, Row, Col } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import React, { Key, useEffect, useState } from 'react';
 
@@ -24,7 +24,8 @@ import { IModal } from './interface';
 import { routerHomepage } from './router';
 import { CalendarOutlined, LaptopOutlined } from '@ant-design/icons';
 import { Area } from '@ant-design/plots';
-import { Select, Progress, Calendar } from 'antd';
+import { Select, Progress, Calendar, Tag } from 'antd';
+import IconNumberProvied from '@shared/components/iconsComponent/IconNumberProvied';
 const dataTable = require('./data.json');
 const { Option, OptGroup } = Select;
 const Homepage = () => {
@@ -61,7 +62,7 @@ const Homepage = () => {
         <div className='title'>
           Biểu đồ cấp số
         </div>
-        <div className='list_graph'>
+        {/* <div className='list_graph'>
           <div className='graph_item'>
             <div className='name'>
               <div className='border_icon'>
@@ -75,40 +76,133 @@ const Homepage = () => {
           </div>
           <div className='graph_item'>
             <div className='name'>
+              <CalendarOutlined className='icon' />
               <div className='border_icon'>
-                <CalendarOutlined className='icon' />
-              </div>
-              Số thứ tự <br /> đã cấp
-            </div>
-            <div className='number'>
-              4.221
-            </div>
-          </div>
-          <div className='graph_item'>
-            <div className='name'>
-              <div className='border_icon'>
-                <CalendarOutlined className='icon' />
-              </div>
-              Số thứ tự <br /> đã cấp
-            </div>
-            <div className='number'>
-              4.221
-            </div>
-          </div>
-          <div className='graph_item'>
-            <div className='name'>
-              <div className='border_icon'>
-                <CalendarOutlined className='icon' />
-              </div>
-              Số thứ tự <br /> đã cấp
-            </div>
-            <div className='number'>
-              4.221
-            </div>
-          </div>
-        </div>
 
-
+              </div>
+              Số thứ tự <br /> đã cấp
+            </div>
+            <div className='number'>
+              4.221
+            </div>
+          </div>
+          <div className='graph_item'>
+            <div className='name'>
+              <div className='border_icon'>
+                <CalendarOutlined className='icon' />
+              </div>
+              Số thứ tự <br /> đã cấp
+            </div>
+            <div className='number'>
+              4.221
+            </div>
+          </div>
+          <div className='graph_item'>
+            <div className='name'>
+              <div className='border_icon'>
+                <CalendarOutlined className='icon' />
+              </div>
+              Số thứ tự <br /> đã cấp
+            </div>
+            <div className='number'>
+              4.221
+            </div>
+          </div>
+        </div> */}
+        <Row className="homepage__list-information" gutter={13}>
+          <Col span={6} className="homepage__item-information">
+            <div className="homepage__item-information-card">
+              <div className="homepage__item-information-card-head">
+                <div className="homepage__item-information-card-head-icon">
+                  <IconNumberProvied />
+                </div>
+                <span className="homepage__item-information-card-head-title">
+                  Số thứ tự đã cấp
+                </span>
+              </div>
+              <div className="homepage__item-information-card-body">
+                <span className="homepage__item-information-card-body-number">
+                  4221
+                </span>
+                <Tag
+                  className="homepage__item-information-card-body-percen"
+                // icon={<ArrowDownOutlined />}
+                >
+                  32.4%
+                </Tag>
+              </div>
+            </div>
+          </Col>
+          <Col span={6} className="homepage__item-information">
+            <div className="homepage__item-information-card">
+              <div className="homepage__item-information-card-head">
+                <div className="homepage__item-information-card-head-icon">
+                  <IconNumberProvied />
+                </div>
+                <span className="homepage__item-information-card-head-title">
+                  Số thứ tự đã cấp
+                </span>
+              </div>
+              <div className="homepage__item-information-card-body">
+                <span className="homepage__item-information-card-body-number">
+                  4221
+                </span>
+                <Tag
+                  className="homepage__item-information-card-body-percen"
+                // icon={<ArrowDownOutlined />}
+                >
+                  32.4%
+                </Tag>
+              </div>
+            </div>
+          </Col>
+          <Col span={6} className="homepage__item-information">
+            <div className="homepage__item-information-card">
+              <div className="homepage__item-information-card-head">
+                <div className="homepage__item-information-card-head-icon">
+                  <IconNumberProvied />
+                </div>
+                <span className="homepage__item-information-card-head-title">
+                  Số thứ tự đã cấp
+                </span>
+              </div>
+              <div className="homepage__item-information-card-body">
+                <span className="homepage__item-information-card-body-number">
+                  4221
+                </span>
+                <Tag
+                  className="homepage__item-information-card-body-percen"
+                // icon={<ArrowDownOutlined />}
+                >
+                  32.4%
+                </Tag>
+              </div>
+            </div>
+          </Col>
+          <Col span={6} className="homepage__item-information">
+            <div className="homepage__item-information-card">
+              <div className="homepage__item-information-card-head">
+                <div className="homepage__item-information-card-head-icon">
+                  <IconNumberProvied />
+                </div>
+                <span className="homepage__item-information-card-head-title">
+                  Số thứ tự đã cấp
+                </span>
+              </div>
+              <div className="homepage__item-information-card-body">
+                <span className="homepage__item-information-card-body-number">
+                  4221
+                </span>
+                <Tag
+                  className="homepage__item-information-card-body-percen"
+                // icon={<ArrowDownOutlined />}
+                >
+                  32.4%
+                </Tag>
+              </div>
+            </div>
+          </Col>
+        </Row>
         <div className='chart_info'>
           <div className='info'>
             <div className='date'>

@@ -19,7 +19,7 @@ import TableComponent from '@shared/components/TableComponent';
 import useTable from '@shared/components/TableComponent/hook';
 import { useAltaIntl } from '@shared/hook/useTranslate';
 
-
+import { DownCircleTwoTone } from '@ant-design/icons'
 import { IModal } from '../Homepage/interface';
 import { routerViewDevice } from './router';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,8 +27,12 @@ import { RootState } from '@modules';
 import { useAppDispatch, useAppSelector } from '@shared/hook/reduxhook';
 import { getDevices } from '@modules/device/respository';
 import { deviceStore } from '@modules/device/deviceStore';
+import { fetchDevicesNew } from '@modules/devicenew/devicenewStore';
+import { IconArrow } from '@shared/components/iconsComponent';
+import { IconAddDevice } from '@shared/components/iconsComponent';
 import { current } from '@reduxjs/toolkit';
-const dataTable = require('./datadevice.json');
+
+
 interface TypeDevices {
     id?: string
     deviceID?: string
@@ -61,15 +65,19 @@ const Device = () => {
     const idChooses = 'id'; //get your id here. Ex: accountId, userId,...
 
     const dispatch = useAppDispatch();
-    const devices: Array<any> | undefined = useAppSelector((state) => state.device.devices);
+    const devices: Array<any> | undefined = useAppSelector((state) => state.devicenew.devices);
+
+
     useEffect(() => {
 
-        getDevices().then((deviceSnap) => {
-            dispatch(deviceStore.actions.fetchDevices({ devices: deviceSnap }));
-        });
+        // getDevices().then((deviceSnap) => {
+        //     dispatch(deviceStore.actions.fetchDevices({ devices: deviceSnap }));
+        // });
+
+        dispatch(fetchDevicesNew())
+    }, [dispatch]);
 
 
-    }, []);
 
     const onDetail = (id: string) => {
         navigate(`/detaildevice/${id}`)
@@ -122,6 +130,7 @@ const Device = () => {
             title: 'Dịch vụ sử dụng',
             dataIndex: 'services',
             render: (texts: string[]) => {
+                console.log(texts);
 
                 return (
                     <div className='d-flex' style={{ flexDirection: 'column' }}>
@@ -137,8 +146,6 @@ const Device = () => {
             title: 'Chi tiết',
             dataIndex: 'detail',
             render: (action: any, record: any) => {
-
-
                 return (
                     <>
                         <a
@@ -225,21 +232,19 @@ const Device = () => {
     return (
         <div className="device">
             <MainTitleComponent breadcrumbs={routerViewDevice} />
-            <div className="main-card" style={{ background: 'none', marginTop: 50 }}>
+            <div className="main-card" style={{ background: 'none', marginTop: 50, padding: 0 }}>
 
                 <div className="d-flex flex-row justify-content-md-between mb-3 align-items-end">
                     <div className="d-flex flex-row " style={{ gap: 10 }}>
                         {arraySelectFilter.map(item => {
-                            console.log(item.name);
-
                             return (
-
                                 <SelectAndLabelComponent
                                     onChange={onChangeSelectStatus(item.name)}
                                     key={item.name}
                                     className="margin-select"
                                     dataString={item.dataString || dataStringConnect}
                                     textLabel={item.textLabel}
+
                                 />
                             )
                         }
@@ -278,7 +283,9 @@ const Device = () => {
                         />
                     </div>
                     <div className='btn_add_device' onClick={linkAddDevice}>
-                        Thêm thiet bi
+
+                        <IconAddDevice />
+                        Thêm thiết bị
                     </div>
                 </div>
             </div>

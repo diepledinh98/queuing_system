@@ -10,7 +10,7 @@ const DetailDevice = () => {
     const { id } = useParams()
 
     const devices: Array<any> | undefined = useAppSelector((state) => {
-        return state.device.devices;
+        return state.devicenew.devices;
     });
     const device = devices?.find((value) => value.id == id);
 
@@ -21,8 +21,6 @@ const DetailDevice = () => {
             <div className="detail__device">
                 <div className="title__detail__device">
                     Quản lý thiết bị
-
-
                 </div>
                 <div className='d-flex'>
 

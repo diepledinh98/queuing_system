@@ -23,20 +23,40 @@ import './style.scss'
 import { addDoc, collection } from "firebase/firestore";
 import { FirebaseConfig } from 'src/firebase/configs';
 import { routerViewAddService } from './router';
+import { createService } from '@modules/service/serviceStore';
+import { useAppDispatch } from '@shared/hook/reduxhook';
 import { async } from '@firebase/util';
 import { NONAME } from 'dns';
-
-
+import { onAuthStateChanged } from 'firebase/auth'
+import { createHistorys } from '@modules/history/historyStore';
+type serviceProps = {
+    id?: string
+    serviceID: string;
+    serviceName: string;
+    serviceStatus: boolean
+    description: string
+    Growauto?: number | string[]
+    Prefix?: string | number
+    Surfix?: string | number
+    Reset?: boolean | number
+};
+interface AuthUser {
+    email: string,
+}
+interface historyProps {
+    id?: string
+    username: string
+    time: string
+    IP: string
+    action: string
+}
 const { TextArea } = Input;
 const Service = () => {
     const { formatMessage } = useAltaIntl();
     const table = useTable();
     const db = FirebaseConfig.getInstance().fbDB
-    // const [modal, setModal] = useState<IModal>({
-    //     isVisible: false,
-    //     dataEdit: null,
-    //     isReadOnly: false,
-    // });
+    const auth = FirebaseConfig.getInstance().auth
+    const dispatch = useAppDispatch()
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
     const [search, setSearch] = useState<string>('');
     const [filter, setFilterOption] = useState<any>();
@@ -54,33 +74,49 @@ const Service = () => {
     const [surfix, setSurfix] = useState(false)
     const [numberSurfix, setNumberSurfix] = useState('0001')
     const [reset, setReset] = useState(false)
-
+    const [usercurrent, setUsercurrent] = useState<AuthUser | any>(null)
     const handleCancel = () => {
         navigate('/service')
     }
+    var presentDate = new Date();
+    var date = presentDate.getDate()
+    var month = presentDate.getMonth()
+    var year = presentDate.getFullYear()
+    var hour = presentDate.getHours()
+    var minutes = presentDate.getMinutes()
+    var seconds = presentDate.getSeconds()
+    var time = ` ${date}/${month}/${year} ${hour}:${minutes}:${seconds}`
     const handleAddService = async () => {
 
-        try {
-            const docRef = await addDoc(collection(db, 'services'), {
-                serviceID: serviceID,
-                serviceName: serviceName,
-                description: description,
-                serviceStatus: true,
-                Growauto: (checkautogrow ? [autoNumberFrom, autoNumberTo] : 0),
-                Prefix: (checkprefix ? prefixNumber : 0),
-                Surfix: (surfix ? numberSurfix : 0),
-                Reset: reset
-            })
-            navigate('/service')
+
+        const body: serviceProps = {
+            serviceID: serviceID,
+            serviceName: serviceName,
+            description: description,
+            serviceStatus: true,
+            Growauto: (checkautogrow ? [autoNumberFrom, autoNumberTo] : 0),
+            Prefix: (checkprefix ? prefixNumber : 0),
+            Surfix: (surfix ? numberSurfix : 0),
+            Reset: reset
+        }
+        const bodyHistory: historyProps = {
+            username: usercurrent?.email,
+            time: time,
+            IP: '192.168.1.10',
+            action: `Thêm thông tin dịch vụ ${serviceName}`
 
         }
-        catch (e) {
-            console.log(e);
 
-        }
+        dispatch(createService(body))
+        dispatch(createHistorys(bodyHistory))
+        navigate('/service')
     }
 
-
+    useEffect(() => {
+        onAuthStateChanged(auth, (curr: any) => {
+            setUsercurrent(curr)
+        })
+    }, [])
     return (
         <div className="addservice__page">
             <MainTitleComponent breadcrumbs={routerViewAddService} />

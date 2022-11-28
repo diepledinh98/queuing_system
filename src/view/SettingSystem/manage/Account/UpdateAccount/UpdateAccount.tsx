@@ -7,16 +7,34 @@ import { addDoc, collection, updateDoc, doc } from "firebase/firestore";
 import { FirebaseConfig } from 'src/firebase/configs';
 import { async } from '@firebase/util';
 import { useNavigate } from 'react-router';
-import { useAppSelector } from '@shared/hook/reduxhook';
+import { useAppSelector, useAppDispatch } from '@shared/hook/reduxhook';
 import { useParams } from 'react-router';
+import { updateAccount } from '@modules/account/accoutStore';
+import { update } from 'lodash';
+
+
 const { Option } = Select;
 const db = FirebaseConfig.getInstance().fbDB
+type accountStore = {
+    id?: string
+    name: string
+    image: string
+    email: string
+    phone: string
+    role: string
+    status: string
+    username: string
+    password: string
+};
+
+
 const UpdateAccount = () => {
     const navigate = useNavigate()
+    const dispatch = useAppDispatch()
     const idd = useParams()
     let id: any = idd.id
     const accounts: Array<any> | undefined = useAppSelector((state) => {
-        return state.account.account
+        return state.account.accounts
     });
     const account = accounts?.find((value) => value.id == id);
     const [name, setName] = useState('')
@@ -38,8 +56,9 @@ const UpdateAccount = () => {
 
     const handleUpdateAccount = async () => {
         try {
-            const accountNeedUpdate = doc(db, "users", id);
-            const dataUpdate = {
+            const idAccount = id
+
+            const body: accountStore = {
                 email: eamil,
                 image: 'https://cdn.pixabay.com/photo/2013/05/11/20/44/spring-flowers-110671_960_720.jpg',
                 name: 'customer',
@@ -49,8 +68,8 @@ const UpdateAccount = () => {
                 status: status,
                 username: username
             }
-            await updateDoc(accountNeedUpdate, dataUpdate)
 
+            dispatch(updateAccount({ idAccount, body }))
             navigate('/setting/manage/account')
         }
         catch (e) {

@@ -26,20 +26,43 @@ import { useAppDispatch, useAppSelector } from '@shared/hook/reduxhook';
 import { provideNumberStore } from '@modules/providenumber/numberStore';
 import { getProvideNumber } from '@modules/providenumber/respository';
 import { Item } from '@antv/g6-core';
-const dataTable = require('./dataprovidenumber.json');
+import { fetchProvideNumber } from '@modules/providenumber/numberStore';
 
-interface DataType {
+type serviceProps = {
     id?: string
-    number?: string
-    customerName?: string
-    serviceName?: string
-    GrantTime?: string
-    expiry?: string
-    status?: string
-    powerSupply?: string
-}
+    serviceID: string;
+    serviceName: string;
+    serviceStatus: boolean
+    Growauto?: number[]
+    Prefix?: string
+    Surfix?: string
+    Reset?: boolean
+};
 
-let data: DataType[] | any;
+type accountStore = {
+    id?: string
+    name: string
+    image: string
+    eamil: string
+    phone: string
+    role: string
+    status: boolean
+    username: string
+    password: string
+};
+type provideNumberProps = {
+    id?: string
+    dateduse: string
+    linkServiceId: string
+    stt: number
+    timeprovide: string
+    status: string
+    service: serviceProps
+    customer: accountStore
+};
+
+
+let data: provideNumberProps[] | any;
 const ProvideNumber = () => {
     const { formatMessage } = useAltaIntl();
     const table = useTable();
@@ -50,14 +73,15 @@ const ProvideNumber = () => {
     const [filter, setFilterOption] = useState<any>();
     const navigate = useNavigate();
     const dispatch = useAppDispatch()
-    const providenumber = useAppSelector((state) => state.providenumber.providenumber)
-    data = providenumber?.map((item, index) => {
-        console.log(item.service.serviceName);
+    const listProvideNumber = useAppSelector((state) => state.providenumber.Number)
+    const providedNumber = useAppSelector((state) => state.providenumber.providedNumber)
+    data = listProvideNumber?.map((item, index) => {
+
 
         return {
             id: item?.id,
             number: item?.stt,
-            customerName: 'Nguyen Van A',
+            customerName: item.customer.username,
             serviceName: item.service.serviceName,
             GrantTime: item?.timeprovide,
             expiry: item?.dateduse,
@@ -66,12 +90,8 @@ const ProvideNumber = () => {
         }
     })
     useEffect(() => {
-        getProvideNumber().then((providenumberSnap) => {
-            dispatch(provideNumberStore.actions.fetchprovidenumber({ providenumber: providenumberSnap }))
-        });
-
-
-    }, []);
+        dispatch(fetchProvideNumber())
+    }, [dispatch]);
 
     const onDetail = (id: string) => {
         navigate(`/detailnumber/${id}`)

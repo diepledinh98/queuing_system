@@ -34,7 +34,7 @@ export default {
   'common.valid.whitespace': 'Vui lòng không nhập khoảng trắng',
   'common.valid.email': 'Phải đúng định dạng',
   'common.deviceType': 'Loại thiết bị',
-
+  'common.addrole': 'Thêm vai trò',
   'common.email': 'Địa chỉ email',
 
   'common.volumn': 'Điều chỉnh âm lượng',
@@ -115,5 +115,12 @@ export default {
   'common.manage.role': 'Quản lý vai trò',
   'common.manage.account': 'Quản lý tài khoản',
   'common.log.user': 'Nhật kí người dùng',
-
+  'common.history.username': 'Tên đăng nhập',
+  'common.history.time': 'Thời gian tác động',
+  'common.history.IP': 'IP thực hiện',
+  'common.history.action': 'Thao tác thực hiện',
+  'commoon.history.updateservice': 'Cập nhật thông tin dịch vụ',
+  'common.role.namerole': 'Tên vai trò',
+  'common.role.numberuser': 'Số người dùng',
+  'common.role.description': 'Mô tả'
 };
