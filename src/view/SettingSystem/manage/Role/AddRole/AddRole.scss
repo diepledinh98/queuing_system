@@ -62,11 +62,12 @@
             .func_role {
                 margin-left: 24px;
                 width: 560px;
-                height: 420px;
+                max-height: 420px;
                 background: #FFF2E7;
                 border-radius: 8px;
                 padding-left: 24px;
                 padding-top: 16px;
+                overflow-y: auto;
 
                 .function {
                     display: flex;

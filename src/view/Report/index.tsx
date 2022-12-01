@@ -1,6 +1,6 @@
 import './style.scss';
 
-import { Space } from 'antd';
+import { Space, DatePicker } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import React, { Key, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -153,7 +153,16 @@ const Report = () => {
                                 textLabel={item.textLabel}
                             />
                         ))}
+                        <div className='select__time'>
+                            <p>Chọn thời gian</p>
+                            <Space direction="vertical" className='time'>
+                                <DatePicker picker="week" />
+                                <DatePicker picker="week" />
+                            </Space>
+
+                        </div>
                     </div>
+
                     <div className="d-flex flex-column ">
                         <div className="label-select">{formatMessage('common.keyword')}</div>
                         <SearchComponent

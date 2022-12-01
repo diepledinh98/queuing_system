@@ -1,6 +1,6 @@
 import './style.scss';
 
-import { Space } from 'antd';
+import { Space, DatePicker } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import React, { Key, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -27,7 +27,7 @@ import { provideNumberStore } from '@modules/providenumber/numberStore';
 import { getProvideNumber } from '@modules/providenumber/respository';
 import { Item } from '@antv/g6-core';
 import { fetchProvideNumber } from '@modules/providenumber/numberStore';
-
+import type { DatePickerProps } from 'antd';
 type serviceProps = {
     id?: string
     serviceID: string;
@@ -68,6 +68,8 @@ const ProvideNumber = () => {
     const table = useTable();
 
     const idChooses = 'id';
+    const [dateStart, setDateStart] = useState('')
+    const [dateEnd, setDateEnd] = useState('')
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
     const [search, setSearch] = useState<string>('');
     const [filter, setFilterOption] = useState<any>();
@@ -89,6 +91,11 @@ const ProvideNumber = () => {
             powerSupply: 'Kiosk'
         }
     })
+
+    const onChangeStart: DatePickerProps['onChange'] = (date, dateString) => {
+        alert(`${date}, ${dateString}`);
+
+    }
     useEffect(() => {
         dispatch(fetchProvideNumber())
     }, [dispatch]);
@@ -199,6 +206,11 @@ const ProvideNumber = () => {
                                 textLabel={item.textLabel}
                             />
                         ))}
+
+                        <Space direction="vertical" className='time'>
+                            <DatePicker picker="week" onChange={onChangeStart} />
+                            <DatePicker picker="week" />
+                        </Space>
                     </div>
                     <div className="d-flex flex-column ">
                         <div className="label-select">{formatMessage('common.keyword')}</div>

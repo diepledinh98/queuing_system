@@ -6,7 +6,9 @@ import './detail_device.scss'
 import { useParams } from 'react-router';
 import { useAppSelector } from '@shared/hook/reduxhook';
 import { Link } from 'react-router-dom';
+import { useAltaIntl } from '@shared/hook/useTranslate';
 const DetailDevice = () => {
+    const { formatMessage } = useAltaIntl();
     const { id } = useParams()
 
     const devices: Array<any> | undefined = useAppSelector((state) => {
@@ -20,26 +22,26 @@ const DetailDevice = () => {
             <MainTitleComponent breadcrumbs={routerViewDetailDevice} />
             <div className="detail__device">
                 <div className="title__detail__device">
-                    Quản lý thiết bị
+                    {formatMessage('common.deviceql')}
                 </div>
                 <div className='d-flex'>
 
                     <div className="content__detail__device">
                         <div className="title_info__device">
-                            Thông tin thiết bị
+                            {formatMessage('common.deviceinfo')}
                         </div>
                         <div >
                             <Row justify="start" style={{ marginLeft: 24, marginTop: 20 }}>
                                 <Col span={12}>
                                     <Row>
-                                        <Col flex="130px" className="text__info_name">Mã thiết bị:</Col>
+                                        <Col flex="130px" className="text__info_name">{formatMessage('common.deviceID')}:</Col>
                                         <Col flex="auto" className="text__info">{device.deviceID}</Col>
                                     </Row>
                                 </Col>
 
                                 <Col span={12}>
                                     <Row>
-                                        <Col flex="130px" className="text__info_name">Loại thiết bị:</Col>
+                                        <Col flex="130px" className="text__info_name">{formatMessage('common.deviceType')}:</Col>
                                         <Col flex="auto" className="text__info">{device.deviceName}</Col>
                                     </Row>
                                 </Col>
@@ -48,14 +50,14 @@ const DetailDevice = () => {
                             <Row justify="start" style={{ marginLeft: 24, marginTop: 20 }}>
                                 <Col span={12}>
                                     <Row>
-                                        <Col flex="130px" className="text__info_name">Tên thiết bị:</Col>
+                                        <Col flex="130px" className="text__info_name">{formatMessage('common.deviceName')}:</Col>
                                         <Col flex="auto" className="text__info">{device.deviceName}</Col>
                                     </Row>
                                 </Col>
 
                                 <Col span={12}>
                                     <Row>
-                                        <Col flex="130px" className="text__info_name">Tên đăng nhập:</Col>
+                                        <Col flex="130px" className="text__info_name">{formatMessage('common.history.username')}:</Col>
                                         <Col flex="auto" className="text__info">{device.username}</Col>
                                     </Row>
                                 </Col>
@@ -64,14 +66,14 @@ const DetailDevice = () => {
                             <Row justify="start" style={{ marginLeft: 24, marginTop: 20 }}>
                                 <Col span={12}>
                                     <Row>
-                                        <Col flex="130px" className="text__info_name">Địa chỉ IP:</Col>
+                                        <Col flex="130px" className="text__info_name">{formatMessage('common.deviceIP')}:</Col>
                                         <Col flex="auto" className="text__info">{device.deviceIP}</Col>
                                     </Row>
                                 </Col>
 
                                 <Col span={12}>
                                     <Row>
-                                        <Col flex="130px" className="text__info_name">Mật khẩu:</Col>
+                                        <Col flex="130px" className="text__info_name">{formatMessage('common.password')}:</Col>
                                         <Col flex="auto" className="text__info">{device.password}</Col>
                                     </Row>
                                 </Col>
@@ -79,7 +81,7 @@ const DetailDevice = () => {
                             </Row>
 
                             <Row>
-                                <div className="list_service text__info_name" style={{ marginLeft: 24, marginTop: 20 }}>Dịch vụ sử dụng:</div>
+                                <div className="list_service text__info_name" style={{ marginLeft: 24, marginTop: 20 }}>{formatMessage('common.serviceuse')}:</div>
                                 <Col span={24} style={{
                                     display: 'flex', fontSize: 16,
                                     fontWeight: 400,
@@ -107,7 +109,7 @@ const DetailDevice = () => {
                     </div>
                     <Link to={`/updatedevice/${device.id}`} className="update__device" >
 
-                        Cập nhật thiết bị
+                        {formatMessage('common.updatedevice')}
                     </Link>
 
                 </div>

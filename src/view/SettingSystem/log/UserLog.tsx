@@ -88,9 +88,7 @@ const UserLog = () => {
     ];
 
 
-    const linkAddDevice = () => {
-        navigate('/AddDevice');
-    }
+
 
     const handleRefresh = () => {
         table.fetchData({ option: { search: search, filter: { ...filter } } });
@@ -158,9 +156,7 @@ const UserLog = () => {
                         bordered
                         disableFirstCallApi={true}
                     />
-                    <div className='btn_add_device' onClick={linkAddDevice}>
-                        Tải về
-                    </div>
+
                 </div>
             </div>
 

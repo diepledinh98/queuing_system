@@ -19,11 +19,12 @@ import useTable from '@shared/components/TableComponent/hook';
 import { useAltaIntl } from '@shared/hook/useTranslate';
 import { fetchProvideNumber } from '@modules/providenumber/numberStore';
 import { routerViewSetting } from '@view/SettingSystem/router';
-
+import { fetchRoles } from '@modules/rolenew/rolenewStore';
 import { useAppDispatch, useAppSelector } from '@shared/hook/reduxhook';
 import { provideNumberStore } from '@modules/providenumber/numberStore';
 import { IconAddDevice } from '@shared/components/iconsComponent';
 import { getProvideNumber } from '@modules/providenumber/respository';
+import { Link } from 'react-router-dom';
 interface DataType {
     id?: string
     reportNumber?: string
@@ -32,6 +33,12 @@ interface DataType {
     status?: string
     powerSupply?: string
 
+}
+interface role {
+    id: string
+    rolename: string
+    numberuse: string
+    description: string
 }
 const RoleManage = () => {
     const { formatMessage } = useAltaIntl();
@@ -45,24 +52,25 @@ const RoleManage = () => {
     const idChooses = 'id'; //get your id here. Ex: accountId, userId,...
 
     const dispatch = useAppDispatch()
-    const providenumber = useAppSelector((state) => state.providenumber.Number)
+    const roles = useAppSelector((state) => state.role.roles)
 
     useEffect(() => {
-        dispatch(fetchProvideNumber())
+        dispatch(fetchRoles())
     }, [dispatch])
-    data = providenumber?.map((item, index) => {
+    data = roles?.map((item, index) => {
 
 
         return {
             id: item?.id,
-            reportNumber: item?.stt,
-            serviceName: item.service.serviceName,
-            GrantTime: item?.timeprovide,
-            status: item?.status,
-            powerSupply: 'Kiosk'
+            rolename: item?.name,
+            numberuse: 2,
+            description: item?.description,
+            update: item
         }
     })
-
+    const onUpdate = () => {
+        navigate(``)
+    }
     const columns: ColumnsType = [
         {
             title: 'common.role.namerole',
@@ -83,16 +91,16 @@ const RoleManage = () => {
             title: 'Cập nhật',
             dataIndex: 'update',
             align: 'center',
-            render: (action: any, record: any) => {
-
+            render: (record: role) => {
                 console.log(record);
+
 
                 return (
                     <>
-                        <a
-
+                        <Link
+                            to={`/setting/manage/updaterole/${record.id}`}
                             style={{ textDecoration: "underline", color: "#4277FF", }}
-                        >Cập nhật</a>
+                        >{formatMessage('common.update')}</Link>
                     </>
 
                 )
@@ -105,10 +113,7 @@ const RoleManage = () => {
         navigate('/setting/manage/addrole');
     }
 
-    const handleRefresh = () => {
-        table.fetchData({ option: { search: search, filter: { ...filter } } });
-        setSelectedRowKeys([]);
-    };
+
 
 
     const dataString: ISelect[] = [{ label: 'common.all', value: undefined }, { label: 'common.onaction', value: undefined }, { label: 'common.stopaction', value: undefined }];
@@ -138,7 +143,7 @@ const RoleManage = () => {
 
                 <div className="d-flex flex-row justify-content-md-between mb-3 align-items-end">
                     <div className="d-flex flex-row " style={{ gap: 10 }}>
-                        <h3 className='title'>Danh sách vai trò</h3>
+                        <h3 className='title'>{formatMessage('common.roles')}</h3>
                     </div>
                     <div className="d-flex flex-column ">
                         <div className="label-select">{formatMessage('common.keyword')}</div>
@@ -165,7 +170,7 @@ const RoleManage = () => {
                     />
                     <div className='btn_add_device' onClick={linkAddRole}>
                         <IconAddDevice />
-                        Thêm vai trò
+                        {formatMessage('common.addrole')}
                     </div>
                 </div>
             </div>

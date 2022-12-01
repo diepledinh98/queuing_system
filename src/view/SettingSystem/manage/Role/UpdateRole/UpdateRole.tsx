@@ -1,17 +1,18 @@
-import './AddRole.scss'
+
 import React, { Key, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import MainTitleComponent from '@shared/components/MainTitleComponent';
 import TableComponent from '@shared/components/TableComponent';
 import useTable from '@shared/components/TableComponent/hook';
 import { useAltaIntl } from '@shared/hook/useTranslate';
-import { routerViewAddRole } from './router';
+import { routerViewUpdateRole } from './router';
 import { Input, Checkbox } from 'antd';
 import { useAppDispatch, useAppSelector } from '@shared/hook/reduxhook';
 import { onAuthStateChanged } from 'firebase/auth'
 import { createHistorys } from '@modules/history/historyStore';
 import { FirebaseConfig } from 'src/firebase/configs';
 import { createRoles } from '@modules/rolenew/rolenewStore';
+import { useParams } from 'react-router';
 import { updateRoles } from '@modules/rolenew/rolenewStore';
 const { TextArea } = Input;
 export interface roleType {
@@ -54,39 +55,50 @@ interface historyProps {
     IP: string
     action: string
 }
-const AddRole = () => {
+const UpdateRole = () => {
     const { formatMessage } = useAltaIntl();
     const navigate = useNavigate()
     const auth = FirebaseConfig.getInstance().auth
     const dispatch = useAppDispatch()
+
+    const idd = useParams()
+    let id: any = idd.id
+    const roles: Array<any> | undefined = useAppSelector((state) => {
+        return state.role.roles
+    });
+    const role = roles?.find((value) => value.id == id);
+
     const [usercurrent, setUsercurrent] = useState<AuthUser | any>(null)
-    const [name, setName] = useState<string>('')
-    const [description, setDescription] = useState<string>('')
-    const [permitViewDevice, setPermitViewDevice] = useState<boolean>(false)
-    const [permitDetailDevice, setpermitDetailDevice] = useState<boolean>(false)
-    const [permitAddDevice, setPermitAddDevice] = useState<boolean>(false)
-    const [permitUpdateDevice, setPermitUpdateDevice] = useState<boolean>(false)
+    const [name, setName] = useState<string>(role.name)
+    const [description, setDescription] = useState<string>(role.description)
+    const [permitViewDevice, setPermitViewDevice] = useState<boolean>(role.permitViewDevice)
+    const [permitDetailDevice, setpermitDetailDevice] = useState<boolean>(role.permitDetailDevice)
+    const [permitAddDevice, setPermitAddDevice] = useState<boolean>(role.permitAddDevice)
+    const [permitUpdateDevice, setPermitUpdateDevice] = useState<boolean>(role.permitUpdateDevice)
 
-    const [permitViewService, setPermitViewService] = useState<boolean>(false)
-    const [permitAddService, setPermitAddService] = useState<boolean>(false)
-    const [permitDetailService, setPermitDetailService] = useState<boolean>(false)
-    const [permitUpdateService, setpermitUpdateService] = useState<boolean>(false)
+    const [permitViewService, setPermitViewService] = useState<boolean>(role.permitViewService)
+    const [permitAddService, setPermitAddService] = useState<boolean>(role.permitAddService)
+    const [permitDetailService, setPermitDetailService] = useState<boolean>(role.permitDetailService)
+    const [permitUpdateService, setpermitUpdateService] = useState<boolean>(role.permitUpdateService)
 
-    const [permitViewNumber, setPermitViewNumber] = useState<boolean>(false)
-    const [permitDetailNumber, setPermitDetailNumber] = useState<boolean>(false)
-    const [permitAddNumber, setpermitAddNumber] = useState<boolean>(false)
+    const [permitViewNumber, setPermitViewNumber] = useState<boolean>(role.permitViewNumber)
+    const [permitDetailNumber, setPermitDetailNumber] = useState<boolean>(role.permitDetailNumber)
+    const [permitAddNumber, setpermitAddNumber] = useState<boolean>(role.permitAddNumber)
 
-    const [permitViewReport, setpermitViewRport] = useState<boolean>(false)
+    const [permitViewReport, setpermitViewRport] = useState<boolean>(role.permitViewReport)
 
-    const [permitViewRole, setPermitViewRole] = useState<boolean>(false)
-    const [permitAddRole, setPermitAddRole] = useState<boolean>(false)
-    const [permitUpdateRole, setpermitUpdateRole] = useState<boolean>(false)
+    const [permitViewRole, setPermitViewRole] = useState<boolean>(role.permitViewRole)
+    const [permitAddRole, setPermitAddRole] = useState<boolean>(role.permitAddRole)
+    const [permitUpdateRole, setpermitUpdateRole] = useState<boolean>(role.permitUpdateRole)
 
-    const [permitViewAccount, setPermitViewAccount] = useState<boolean>(false)
-    const [permitAddAccount, setpermitAddAccount] = useState<boolean>(false)
-    const [permitUpdateAccount, setPermitUpdateAccount] = useState<boolean>(false)
+    const [permitViewAccount, setPermitViewAccount] = useState<boolean>(role.permitViewAccount)
+    const [permitAddAccount, setpermitAddAccount] = useState<boolean>(role.permitAddAccount)
+    const [permitUpdateAccount, setPermitUpdateAccount] = useState<boolean>(role.permitUpdateAccount)
 
-    const [permitViewHistory, setPermitViewHistory] = useState<boolean>(false)
+    const [permitViewHistory, setPermitViewHistory] = useState<boolean>(role.permitViewHistory)
+
+
+
 
     var presentDate = new Date();
     var date = presentDate.getDate()
@@ -102,10 +114,9 @@ const AddRole = () => {
         })
     }, [])
 
-    const handleCancel = () => {
-        navigate('/setting/manage/role')
-    }
-    const handleUpdateRole = () => {
+
+    const handleAddRole = () => {
+        const idRole = id
         const body: roleType = {
             name: name,
             description: description,
@@ -140,24 +151,24 @@ const AddRole = () => {
             username: usercurrent?.email,
             time: time,
             IP: '192.168.1.10',
-            action: `Thêm thông tin vai trò ${name}`
+            action: `Cập nhật thông tin vai trò ${name}`
         }
 
-        dispatch(createRoles(body))
+        dispatch(updateRoles({ idRole, body }))
         dispatch(createHistorys(bodyHistory))
         navigate('/setting/manage/role')
     }
 
     return (
         <div className="addrole__page">
-            <MainTitleComponent breadcrumbs={routerViewAddRole} />
+            <MainTitleComponent breadcrumbs={routerViewUpdateRole} />
             <div className='title__addrole'>{formatMessage('common.roles')}</div>
             <div className='main_page'>
                 <div className='name__addrole'>{formatMessage('common.roleinfo')}</div>
                 <div className='content'>
                     <div className='info_role'>
                         <p className="name__add">{formatMessage('common.role.namerole')} <span style={{ color: 'red' }}>*</span></p>
-                        <Input className='add__input' onChange={(event) => setName(event.target.value)} />
+                        <Input className='add__input' defaultValue={name} onChange={(event) => setName(event.target.value)} />
                         <p>{formatMessage('common.role.description')}: <span style={{ color: 'red' }}>*</span></p>
                         <TextArea
                             defaultValue={description}
@@ -172,80 +183,80 @@ const AddRole = () => {
                     <div className='func_role'>
                         <div className='function'>
                             <div className='title_function'>{formatMessage('common.roledevice')}</div>
-                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setPermitViewDevice(event.target.checked)}>
+                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} checked={permitViewDevice} onChange={(event) => setPermitViewDevice(event.target.checked)}>
                                 {formatMessage('common.roleviewdevice')}
                             </Checkbox>
-                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setpermitDetailDevice(event.target.checked)}>
+                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} checked={permitDetailDevice} onChange={(event) => setpermitDetailDevice(event.target.checked)}>
                                 {formatMessage('common.roledetailedevice')}
                             </Checkbox>
-                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setPermitAddDevice(event.target.checked)}>
+                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} checked={permitAddDevice} onChange={(event) => setPermitAddDevice(event.target.checked)}>
                                 {formatMessage('common.roleadđevice')}
                             </Checkbox>
-                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setPermitUpdateDevice(event.target.checked)}>
+                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} checked={permitUpdateDevice} onChange={(event) => setPermitUpdateDevice(event.target.checked)}>
                                 {formatMessage('common.roleupdatedevice')}
                             </Checkbox>
                         </div>
                         <div className='function'>
                             <div className='title_function'>{formatMessage('common.roleservice')}</div>
-                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setPermitViewService(event.target.checked)}>
+                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} checked={permitViewService} onChange={(event) => setPermitViewService(event.target.checked)}>
                                 {formatMessage('common.roleviewservice')}
                             </Checkbox>
-                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setPermitDetailService(event.target.checked)}>
+                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} checked={permitDetailService} onChange={(event) => setPermitDetailService(event.target.checked)}>
                                 {formatMessage('common.roledetailservice')}
                             </Checkbox>
-                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setPermitAddService(event.target.checked)}>
+                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} checked={permitAddService} onChange={(event) => setPermitAddService(event.target.checked)}>
                                 {formatMessage('common.roleaddservice')}
                             </Checkbox>
-                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setpermitUpdateService(event.target.checked)}>
+                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} checked={permitUpdateService} onChange={(event) => setpermitUpdateService(event.target.checked)}>
                                 {formatMessage('common.roleupdateservice')}
                             </Checkbox>
                         </div>
                         <div className='function'>
                             <div className='title_function'>{formatMessage('common.roleprovidenumber')}</div>
-                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setPermitViewNumber(event.target.checked)}>
+                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} checked={permitViewNumber} onChange={(event) => setPermitViewNumber(event.target.checked)}>
                                 {formatMessage('common.roleviewprovidenumber')}
                             </Checkbox>
-                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setPermitDetailNumber(event.target.checked)}>
+                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} checked={permitDetailNumber} onChange={(event) => setPermitDetailNumber(event.target.checked)}>
                                 {formatMessage('common.roledetailprovidenumber')}
                             </Checkbox>
-                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setpermitAddNumber(event.target.checked)}>
+                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} checked={permitAddNumber} onChange={(event) => setpermitAddNumber(event.target.checked)}>
                                 {formatMessage('common.roleaddprovidenumber')}
                             </Checkbox>
 
                         </div>
                         <div className='function'>
                             <div className='title_function'>{formatMessage('common.rolereport')}</div>
-                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setpermitViewRport(event.target.checked)}>
+                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} checked={permitViewReport} onChange={(event) => setpermitViewRport(event.target.checked)}>
                                 {formatMessage('common.roleviewreport')}
                             </Checkbox>
                         </div>
                         <div className='function'>
                             <div className='title_function'>{formatMessage('common.roleroles')}</div>
-                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setPermitViewRole(event.target.checked)}>
+                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} checked={permitViewRole} onChange={(event) => setPermitViewRole(event.target.checked)}>
                                 {formatMessage('common.roleview')}
                             </Checkbox>
-                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setPermitAddRole(event.target.checked)}>
+                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} checked={permitAddRole} onChange={(event) => setPermitAddRole(event.target.checked)}>
                                 {formatMessage('common.roleadd')}
                             </Checkbox>
-                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setpermitUpdateRole(event.target.checked)}>
+                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} checked={permitUpdateRole} onChange={(event) => setpermitUpdateRole(event.target.checked)}>
                                 {formatMessage('common.roleupdate')}
                             </Checkbox>
                         </div>
                         <div className='function'>
                             <div className='title_function'>{formatMessage('common.roleaccount')}</div>
-                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setPermitViewAccount(event.target.checked)}>
+                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} checked={permitViewAccount} onChange={(event) => setPermitViewAccount(event.target.checked)}>
                                 {formatMessage('common.roleviewaccount')}
                             </Checkbox>
-                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setpermitAddAccount(event.target.checked)}>
+                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} checked={permitAddAccount} onChange={(event) => setpermitAddAccount(event.target.checked)}>
                                 {formatMessage('common.roleaddaccount')}
                             </Checkbox>
-                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setPermitUpdateAccount(event.target.checked)}>
+                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} checked={permitUpdateAccount} onChange={(event) => setPermitUpdateAccount(event.target.checked)}>
                                 {formatMessage('common.roleupdateaccount')}
                             </Checkbox>
                         </div>
                         <div className='function'>
                             <div className='title_function'>{formatMessage('common.rolehistory')}</div>
-                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setPermitViewHistory(event.target.checked)}>
+                            <Checkbox className='checkbox' style={{ marginLeft: 9 }} checked={permitViewHistory} onChange={(event) => setPermitViewHistory(event.target.checked)}>
                                 {formatMessage('common.roleviewhistory')}
                             </Checkbox>
 
@@ -255,15 +266,15 @@ const AddRole = () => {
             </div>
 
             <div className='btn'>
-                <div className='btn-cancel' onClick={handleCancel}>
+                <div className='btn-cancel'>
                     {formatMessage('common.cancell')}
                 </div>
-                <div className='btn-add' onClick={handleUpdateRole}>
-                    {formatMessage('common.add')}
+                <div className='btn-add' onClick={handleAddRole}>
+                    {formatMessage('common.update')}
                 </div>
             </div>
         </div>
     );
 };
 
-export default AddRole;
+export default UpdateRole;

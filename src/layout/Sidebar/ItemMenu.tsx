@@ -60,9 +60,9 @@ const Item: React.FC<IMenu> = (props: IMenu) => {
       const activeMenu = location.pathname.match(activePath);
       return activeMenu ? 'menu-active' : '';
     }
-    return matchPath(location.pathname, { path: item?.path, exact: item?.exact })
-      ? 'menu-active'
-      : '';
+    // return matchPath(location.pathname, { path: item?.path, exact: item?.exact })
+    //   ? 'menu-active'
+    //   : '';
   }, [item.exact, activePath, item.path, location.pathname]);
   let path = item.path;
   if (item.menu?.generatePath) {
@@ -92,7 +92,7 @@ const Item: React.FC<IMenu> = (props: IMenu) => {
     );
   }
 
-  console.log(item)
+
 
   return (
     <div className={`menu--component--item ${active}`}>

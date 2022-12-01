@@ -1,32 +1,16 @@
 import './style.scss';
 
-import { Space, DatePicker } from 'antd';
-import { ColumnsType } from 'antd/lib/table';
 import React, { Key, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import ISelect from '@core/select';
-import RightMenu, { IArrayAction } from '@layout/RightMenu';
-import CircleLabel from '@shared/components/CircleLabel';
-import { DeleteConfirm } from '@shared/components/ConfirmDelete';
-import EditIconComponent from '@shared/components/EditIconComponent';
-import InformationIconComponent from '@shared/components/InformationIcon';
 import MainTitleComponent from '@shared/components/MainTitleComponent';
-import SearchComponent from '@shared/components/SearchComponent/SearchComponent';
-import SelectAndLabelComponent, {
-    ISelectAndLabel,
-} from '@shared/components/SelectAndLabelComponent';
-import TableComponent from '@shared/components/TableComponent';
 import useTable from '@shared/components/TableComponent/hook';
 import { useAltaIntl } from '@shared/hook/useTranslate';
-import { Col, Row, Input, Checkbox, InputNumber } from 'antd';
+import { Col, Row, Input, Checkbox } from 'antd';
 import './style.scss'
-import { addDoc, collection } from "firebase/firestore";
 import { FirebaseConfig } from 'src/firebase/configs';
 import { routerViewAddService } from './router';
 import { createService } from '@modules/service/serviceStore';
 import { useAppDispatch } from '@shared/hook/reduxhook';
-import { async } from '@firebase/util';
-import { NONAME } from 'dns';
 import { onAuthStateChanged } from 'firebase/auth'
 import { createHistorys } from '@modules/history/historyStore';
 type serviceProps = {

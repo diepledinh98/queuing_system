@@ -31,8 +31,13 @@ import { fetchDevicesNew } from '@modules/devicenew/devicenewStore';
 import { IconArrow } from '@shared/components/iconsComponent';
 import { IconAddDevice } from '@shared/components/iconsComponent';
 import { current } from '@reduxjs/toolkit';
-
-
+import { Select, Input } from 'antd';
+import { collection, DocumentData, onSnapshot, QuerySnapshot } from "firebase/firestore";
+import { FirebaseConfig } from 'src/firebase/configs';
+import { format } from 'path';
+const { Search } = Input;
+const { Option, OptGroup } = Select;
+const db = FirebaseConfig.getInstance().fbDB
 interface TypeDevices {
     id?: string
     deviceID?: string
@@ -63,7 +68,8 @@ const Device = () => {
     const [filter, setFilterOption] = useState<any>();
     const navigate = useNavigate();
     const idChooses = 'id'; //get your id here. Ex: accountId, userId,...
-
+    const [status, setStatus] = useState<string>('All')
+    const [connect, setConnect] = useState<string>('All')
     const dispatch = useAppDispatch();
     const devices: Array<any> | undefined = useAppSelector((state) => state.devicenew.devices);
 
@@ -87,22 +93,22 @@ const Device = () => {
     }
     const columns: ColumnsType = [
         {
-            title: 'Mã thiết bị',
+            title: 'common.deviceID',
             dataIndex: 'deviceID',
             align: 'left'
         },
         {
-            title: 'Tên thiết bị',
+            title: 'common.deviceName',
             className: 'column-money',
             dataIndex: 'deviceName',
             align: 'left',
         },
         {
-            title: 'Địa chỉ IP',
+            title: 'common.deviceIP',
             dataIndex: 'deviceIP',
         },
         {
-            title: 'Trạng thái hoạt động',
+            title: 'common.titleaction',
             dataIndex: 'deviceStatus',
             render: (status: boolean) => (
                 <>
@@ -116,7 +122,7 @@ const Device = () => {
             ,
         },
         {
-            title: 'Trạng thái kết nối',
+            title: 'common.titlteconnect',
             dataIndex: 'deviceConnect',
             render: (connect: boolean) => (
                 <>
@@ -127,23 +133,23 @@ const Device = () => {
             )
         },
         {
-            title: 'Dịch vụ sử dụng',
+            title: 'common.serviceuse',
             dataIndex: 'services',
             render: (texts: string[]) => {
-                console.log(texts);
+
 
                 return (
                     <div className='d-flex' style={{ flexDirection: 'column' }}>
                         {
 
                             `${texts[0]},...`}
-                        <div style={{ textDecoration: 'underline', color: '#4277FF' }}>Xem Thêm</div>
+                        <div style={{ textDecoration: 'underline', color: '#4277FF' }}>{formatMessage('common.viewPlus')}</div>
                     </div>
                 )
             }
 
         }, {
-            title: 'Chi tiết',
+            title: 'common.detail',
             dataIndex: 'detail',
             render: (action: any, record: any) => {
                 return (
@@ -151,14 +157,14 @@ const Device = () => {
                         <a
                             onClick={() => onDetail(record.id)}
                             style={{ textDecoration: "underline", color: "#4277FF", }}
-                        >Chi tiết</a>
+                        >{formatMessage('common.detail')}</a>
                     </>
 
                 )
             }
         },
         {
-            title: 'Cập nhật',
+            title: 'common.update',
             dataIndex: 'update',
             render: (action: any, record: any) => {
 
@@ -168,7 +174,7 @@ const Device = () => {
                         <a
                             onClick={() => onUpdate(record.id)}
                             style={{ textDecoration: "underline", color: "#4277FF", }}
-                        >Cập nhật</a>
+                        >{formatMessage('common.update')}</a>
                     </>
 
                 )
@@ -181,51 +187,70 @@ const Device = () => {
         navigate('/AddDevice');
     }
 
-    const handleRefresh = () => {
-        table.fetchData({ option: { search: search, filter: { ...filter } } });
-        setSelectedRowKeys([]);
-    };
 
+    const onSearch = (value: string) => {
+        setSearch(value)
+    }
 
-    const dataString: ISelect[] = [{ label: 'common.all', value: undefined }, { label: 'common.onaction', value: undefined }, { label: 'common.stopaction', value: undefined }];
-    const dataStringConnect: ISelect[] = [{ label: 'common.all', value: undefined }, { label: 'common.onconnect', value: undefined }, { label: 'common.stopconnect', value: undefined }];
-    const arraySelectFilter: ISelectAndLabel[] = [
-        { textLabel: 'Trạng thái hoạt động', dataString },
-        { textLabel: 'Trạng thái kết nối', dataStringConnect },
-    ];
+    const handleChangeStatus = (value: string) => {
+        setStatus(value)
+        // setResult(foundItems)
+    }
+    const handleChangeConnect = (value: string) => {
+        setConnect(value)
+    }
+    const resolve = (search: string, status: string, connect: string) => {
+        return devices?.filter((item) => {
 
-    useEffect(() => {
+            if (status === 'All') {
 
-
-    }, [search, filter, table]);
-
-    const handleSearch = (searchKey: string) => {
-        setSearch(searchKey);
-        const foundItems = devices?.filter((item) => {
-            return item.deviceName.toLowerCase()?.includes(search)
+                if (connect === 'All') {
+                    return item.deviceName.toLowerCase()?.includes(search.toLocaleLowerCase())
+                }
+                if (connect === 'connect') {
+                    return item.deviceName.toLowerCase()?.includes(search.toLocaleLowerCase()) && item.deviceConnect === true
+                }
+                if (connect === 'notConnect') {
+                    return item.deviceName.toLowerCase()?.includes(search.toLocaleLowerCase()) && item.deviceConnect === false
+                }
+            }
+            if (status === 'active') {
+                if (connect === 'All') {
+                    return item.deviceName.toLowerCase()?.includes(search.toLocaleLowerCase()) && item.deviceStatus === true
+                }
+                if (connect === 'connect') {
+                    return item.deviceName.toLowerCase()?.includes(search.toLocaleLowerCase()) && item.deviceStatus === true && item.deviceConnect === true
+                }
+                if (connect === 'notConnect') {
+                    return item.deviceName.toLowerCase()?.includes(search.toLocaleLowerCase()) && item.deviceStatus === true && item.deviceConnect === false
+                }
+            }
+            if (status === 'notActive') {
+                if (connect === 'All') {
+                    return item.deviceName.toLowerCase()?.includes(search.toLocaleLowerCase()) && item.deviceStatus === false
+                }
+                if (connect === 'connect') {
+                    return item.deviceName.toLowerCase()?.includes(search.toLocaleLowerCase()) && item.deviceStatus === false && item.deviceConnect === true
+                }
+                if (connect === 'notConnect') {
+                    return item.deviceName.toLowerCase()?.includes(search.toLocaleLowerCase()) && item.deviceStatus === false && item.deviceConnect === false
+                }
+            }
         })
+    }
 
-        setResult(foundItems)
 
-    };
-
-    const onChangeSelectStatus = (name: string | undefined) => (status: any) => {
-        if (name && status) {
-            setFilterOption((pre: any) => ({ ...pre, [name]: status }));
-        }
-        console.log(name);
-
-    };
     const [current, setCurrent] = useState(1)
     //pagination 
     const pageSize = 10
     const getData = (current: any, pageSize: any) => {
-        if (result && result.length > 0) {
-            return result?.slice((current - 1) * pageSize, current * pageSize)
+
+        if (resolve(search, status, connect) && resolve(search, status, connect).length > 0) {
+            return resolve(search, status, connect)?.slice((current - 1) * pageSize, current * pageSize)
         }
-        else {
-            return devices?.slice((current - 1) * pageSize, current * pageSize)
-        }
+        // else {
+        //     return devices?.slice((current - 1) * pageSize, current * pageSize)
+        // }
 
     }
 
@@ -236,7 +261,7 @@ const Device = () => {
 
                 <div className="d-flex flex-row justify-content-md-between mb-3 align-items-end">
                     <div className="d-flex flex-row " style={{ gap: 10 }}>
-                        {arraySelectFilter.map(item => {
+                        {/* {arraySelectFilter.map(item => {
                             return (
                                 <SelectAndLabelComponent
                                     onChange={onChangeSelectStatus(item.name)}
@@ -248,15 +273,33 @@ const Device = () => {
                                 />
                             )
                         }
-                        )}
+                        )} */}
+                        <div className='sortt'>
+                            <label>{formatMessage('common.titleaction')}</label>
+                            <Select defaultValue={formatMessage('common.all')} style={{ width: 200 }} className="margin-select" onChange={handleChangeStatus}>
+                                <Option value="All">{formatMessage('common.all')}</Option>
+                                <Option value="active">{formatMessage('common.onaction')}</Option>
+                                <Option value="notActive">{formatMessage('common.stopaction')}</Option>
+                            </Select>
+                        </div>
+
+                        <div className='sortt'>
+                            <label>{formatMessage('common.titlteconnect')}</label>
+                            <Select defaultValue={formatMessage('common.all')} style={{ width: 200 }} className="margin-select" onChange={handleChangeConnect}>
+                                <Option value="All">{formatMessage('common.all')}</Option>
+                                <Option value="connect">{formatMessage('common.onconnect')}</Option>
+                                <Option value="notConnect">{formatMessage('common.stopconnect')}</Option>
+                            </Select>
+                        </div>
                     </div>
                     <div className="d-flex flex-column ">
                         <div className="label-select">{formatMessage('common.keyword')}</div>
-                        <SearchComponent
+                        {/* <SearchComponent
                             onSearch={handleSearch}
                             placeholder={'common.keyword'}
                             classNames="mb-0 search-table"
-                        />
+                        /> */}
+                        <Search placeholder="input search text" onSearch={onSearch} />
                     </div>
                 </div>
                 <div className='d-flex' >
@@ -271,6 +314,7 @@ const Device = () => {
                             columns={columns}
                             // onRowSelect={setSelectedRowKeys}
                             dataSource={getData(current, pageSize)}
+
                             bordered
                             disableFirstCallApi={true}
                             pagination={false}
@@ -285,7 +329,7 @@ const Device = () => {
                     <div className='btn_add_device' onClick={linkAddDevice}>
 
                         <IconAddDevice />
-                        Thêm thiết bị
+                        {formatMessage('common.adddevice')}
                     </div>
                 </div>
             </div>

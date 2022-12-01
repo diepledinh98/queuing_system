@@ -85,7 +85,7 @@ const ProvideNumber = () => {
     var minutes = presentDate.getMinutes()
 
     var time = `${hour < 10 ? `0${hour}` : hour}:${minutes < 10 ? `0${minutes}` : minutes} - ${date < 10 ? `0${date}` : date}/${month < 10 ? `0${month}` : month}/${year}`
-    var dated = `${hour}:${minutes} - ${date + 1}/${month}/${year}`
+    var dated = `${hour < 10 ? `0${hour}` : hour}:${minutes < 10 ? `0${minutes}` : minutes} - ${date < 10 ? `0${date}` : date}/${month < 10 ? `0${month}` : month}/${year + 1}`
     const services: Array<any> = useAppSelector((state) => {
         return state.service.services
     });

@@ -13,6 +13,7 @@ import { updateDevice } from '@modules/devicenew/devicenewStore';
 import { useNavigate } from 'react-router';
 import { createHistorys } from '@modules/history/historyStore';
 import { onAuthStateChanged } from 'firebase/auth'
+import { useAltaIntl } from '@shared/hook/useTranslate';
 interface deviceProps {
     id?: string
     deviceID: string;
@@ -37,6 +38,7 @@ interface AuthUser {
     email: string,
 }
 const UpdateDevice = () => {
+    const { formatMessage } = useAltaIntl();
     const db = FirebaseConfig.getInstance().fbDB
     const auth = FirebaseConfig.getInstance().auth
     const idd = useParams()
@@ -65,7 +67,7 @@ const UpdateDevice = () => {
     var hour = presentDate.getHours()
     var minutes = presentDate.getMinutes()
     var seconds = presentDate.getSeconds()
-    var time = ` ${date}/${month}/${year} ${hour}:${minutes}:${seconds}`
+    var time = `${hour < 10 ? `0${hour}` : hour}:${minutes < 10 ? `0${minutes}` : minutes} - ${date < 10 ? `0${date}` : date}/${month < 10 ? `0${month}` : month}/${year}`
     useEffect(() => {
         onAuthStateChanged(auth, (curr: any) => {
             setUsercurrent(curr)
@@ -81,8 +83,8 @@ const UpdateDevice = () => {
             deviceIP: deviceIP,
             deviceName: deviceName,
             deviceID: deviceId,
-            deviceStatus: true,
-            deviceConnect: true,
+            deviceStatus: device.deviceStatus,
+            deviceConnect: device.deviceConnect,
             detail: 'chi tiết',
             update: 'cập nhật',
             services: selectedItems,
@@ -105,20 +107,20 @@ const UpdateDevice = () => {
             <MainTitleComponent breadcrumbs={routerViewUpdateDevice} />
             <div className="add_device">
                 <div className="title__add">
-                    Quản lý thiết bị
+                    {formatMessage('common.deviceql')}
                 </div>
                 <div className="content__add">
                     <div className="sub__title__add">
-                        Thông tin thiết bị
+                        {formatMessage('common.deviceinfo')}
                     </div>
                     <div className="body__add">
                         <Row>
                             <Col span={12}>
-                                <p className="name__add">Mã thiết bị <span style={{ color: 'red' }}>*</span></p>
+                                <p className="name__add">{formatMessage('common.deviceID')}<span style={{ color: 'red' }}>*</span></p>
                                 <Input className='add__input' placeholder="Nhâp mã thiết bị" defaultValue={device.deviceID} onChange={(event) => setDeviceId(event.target.value)} />
                             </Col>
                             <Col span={12}>
-                                <p className="name__add">Loại thiết bị <span style={{ color: 'red' }}>*</span></p>
+                                <p className="name__add">{formatMessage('common.deviceType')} <span style={{ color: 'red' }}>*</span></p>
                                 <select className="add__input" placeholder="Chọn thiết bị" defaultValue={device.setDeviceName} onChange={(event) => setDeviceName(event.target.value)}>
                                     <option value="kio01">KIO_01</option>
 
@@ -127,27 +129,27 @@ const UpdateDevice = () => {
                         </Row>
                         <Row style={{ marginTop: 16 }}>
                             <Col span={12}>
-                                <p className="name__add">Tên thiết bị <span style={{ color: 'red' }}>*</span></p>
+                                <p className="name__add">{formatMessage('common.deviceName')} <span style={{ color: 'red' }}>*</span></p>
                                 <Input className='add__input' placeholder="Nhập tên thiết bị" defaultValue={device?.deviceName} onChange={(event) => setDeviceName(event.target.value)} />
                             </Col>
                             <Col span={12}>
-                                <p className="name__add">Tên đăng nhập <span style={{ color: 'red' }}>*</span></p>
+                                <p className="name__add">{formatMessage('common.history.username')}<span style={{ color: 'red' }}>*</span></p>
                                 <Input className='add__input' placeholder="Nhập tài khoản" defaultValue={device?.username} onChange={(event) => setUsername(event.target.value)} />
                             </Col>
                         </Row>
                         <Row style={{ marginTop: 16 }}>
                             <Col span={12}>
-                                <p className="name__add">Địa chỉ IP <span style={{ color: 'red' }}>*</span></p>
+                                <p className="name__add">{formatMessage('common.deviceIP')} <span style={{ color: 'red' }}>*</span></p>
                                 <Input className='add__input' placeholder="Nhập địa chỉ IP" defaultValue={device?.deviceIP} onChange={(event) => setDeviceIP(event.target.value)} />
                             </Col>
                             <Col span={12}>
-                                <p className="name__add">Mật khẩu <span style={{ color: 'red' }}>*</span></p>
+                                <p className="name__add">{formatMessage('common.password')} <span style={{ color: 'red' }}>*</span></p>
                                 <Input className='add__input' placeholder="Nhập mật khẩu" defaultValue={device?.password} onChange={(event) => setPassword(event.target.value)} />
                             </Col>
                         </Row>
 
                         <Row style={{ marginTop: 16 }}>
-                            <p className="name__add">Dịch vụ sử dụng <span style={{ color: 'red' }}>*</span></p>
+                            <p className="name__add">{formatMessage('common.serviceuse')} <span style={{ color: 'red' }}>*</span></p>
                             <Select
                                 className="add__service"
                                 mode="multiple"
@@ -164,10 +166,10 @@ const UpdateDevice = () => {
                 </div>
                 <div className="action__add">
                     <div className="btn__add btn_cancel" onClick={HandleCancel}>
-                        Hủy bỏ
+                        {formatMessage('common.cancell')}
                     </div>
                     <div className="btn__add btn__add_device" onClick={HandleUpdate}>
-                        Cập nhật
+                        {formatMessage('common.update')}
                     </div>
                 </div>
             </div>
