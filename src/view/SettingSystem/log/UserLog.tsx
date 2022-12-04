@@ -1,30 +1,20 @@
 
 
-import { Space } from 'antd';
+import { Space, DatePicker, Input, Pagination } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import React, { Key, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import ISelect from '@core/select';
-import RightMenu, { IArrayAction } from '@layout/RightMenu';
-import CircleLabel from '@shared/components/CircleLabel';
-import { DeleteConfirm } from '@shared/components/ConfirmDelete';
-import EditIconComponent from '@shared/components/EditIconComponent';
-import InformationIconComponent from '@shared/components/InformationIcon';
-import MainTitleComponent from '@shared/components/MainTitleComponent';
-import SearchComponent from '@shared/components/SearchComponent/SearchComponent';
 import SelectAndLabelComponent, {
     ISelectAndLabel,
 } from '@shared/components/SelectAndLabelComponent';
 import TableComponent from '@shared/components/TableComponent';
 import useTable from '@shared/components/TableComponent/hook';
 import { useAltaIntl } from '@shared/hook/useTranslate';
-import { fetchProvideNumber } from '@modules/providenumber/numberStore';
-
 import { fetchHistorys } from '@modules/history/historyStore';
 import { useAppDispatch, useAppSelector } from '@shared/hook/reduxhook';
-import { provideNumberStore } from '@modules/providenumber/numberStore';
-import { getProvideNumber } from '@modules/providenumber/respository';
-
+const { Search } = Input
+const { RangePicker } = DatePicker
 interface DataType {
     id?: string
     reportNumber?: string
@@ -54,10 +44,8 @@ const UserLog = () => {
     const idChooses = 'id'; //get your id here. Ex: accountId, userId,...
 
     const dispatch = useAppDispatch()
-    const providenumber = useAppSelector((state) => state.providenumber.Number)
     const historys = useAppSelector((state) => state.history.historys)
     useEffect(() => {
-        dispatch(fetchProvideNumber())
         dispatch(fetchHistorys())
     }, [dispatch])
 
@@ -88,34 +76,20 @@ const UserLog = () => {
     ];
 
 
-
-
-    const handleRefresh = () => {
-        table.fetchData({ option: { search: search, filter: { ...filter } } });
-        setSelectedRowKeys([]);
+    const handleSearch = (value: string) => {
+        setSearch(value);
     };
-
-
-    const dataString: ISelect[] = [{ label: 'common.all', value: undefined }, { label: 'common.onaction', value: undefined }, { label: 'common.stopaction', value: undefined }];
-
-    const arraySelectFilter: ISelectAndLabel[] = [
-        { textLabel: 'Trạng thái hoạt động', dataString },
-
-    ];
-
-    useEffect(() => {
-        table.fetchData({ option: { search: search, filter: { ...filter } } });
-    }, [search, filter, table]);
-
-    const handleSearch = (searchKey: string) => {
-        setSearch(searchKey);
-    };
-
-    const onChangeSelectStatus = (name: string | undefined) => (status: any) => {
-        if (name && status) {
-            setFilterOption((pre: any) => ({ ...pre, [name]: status }));
-        }
-    };
+    const resolve = (search: string) => {
+        return historys?.filter((item) => {
+            return item?.action?.toLowerCase()?.includes(search.toLocaleLowerCase())
+        })
+    }
+    const [current, setCurrent] = useState(1)
+    //pagination 
+    const pageSize = 10
+    const getData = (current: any, pageSize: any) => {
+        return resolve(search)?.slice((current - 1) * pageSize, current * pageSize)
+    }
     return (
         <div className="service__page">
 
@@ -123,39 +97,44 @@ const UserLog = () => {
 
                 <div className="d-flex flex-row justify-content-md-between mb-3 align-items-end">
                     <div className="d-flex flex-row " style={{ gap: 10 }}>
-                        {arraySelectFilter.map(item => (
-                            <SelectAndLabelComponent
-                                onChange={onChangeSelectStatus(item.name)}
-                                key={item.name}
-                                className="margin-select"
-                                dataString={item.dataString}
-                                textLabel={item.textLabel}
-                            />
-                        ))}
+                        <div className='select__time'>
+                            <p>{formatMessage('common.selecttime')}</p>
+                            <Space direction="vertical" className='time'>
+                                <RangePicker picker="week" />
+
+
+                            </Space>
+
+                        </div>
                     </div>
                     <div className="d-flex flex-column ">
                         <div className="label-select">{formatMessage('common.keyword')}</div>
-                        <SearchComponent
-                            onSearch={handleSearch}
-                            placeholder={'common.keyword'}
-                            classNames="mb-0 search-table"
-                        />
+                        <Search placeholder="Nhập Thông tin thao tác" onSearch={handleSearch} />
                     </div>
                 </div>
                 <div className='d-flex' >
+                    <div>
 
-                    <TableComponent
-                        // apiServices={}
-                        defaultOption={filter}
-                        translateFirstKey="homepage"
-                        rowKey={res => res[idChooses]}
-                        register={table}
-                        columns={columns}
-                        // onRowSelect={setSelectedRowKeys}
-                        dataSource={historys}
-                        bordered
-                        disableFirstCallApi={true}
-                    />
+                        <TableComponent
+                            // apiServices={}
+                            defaultOption={filter}
+                            translateFirstKey="homepage"
+                            rowKey={res => res[idChooses]}
+                            register={table}
+                            columns={columns}
+                            // onRowSelect={setSelectedRowKeys}
+                            dataSource={getData(current, pageSize)?.reverse()}
+                            bordered
+                            disableFirstCallApi={true}
+                            pagination={false}
+                        />
+                        <Pagination
+                            total={historys?.length}
+                            current={current}
+                            onChange={setCurrent}
+                            pageSize={pageSize}
+                        />
+                    </div>
 
                 </div>
             </div>

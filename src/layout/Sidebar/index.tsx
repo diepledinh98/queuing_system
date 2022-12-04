@@ -9,6 +9,7 @@ import CheckPermission from '@shared/hoc/CheckPermission';
 import './style.scss'
 import MenuItem from './ItemMenu';
 import authenticationPresenter from '@modules/authentication/presenter';
+import IconLogout from '@shared/components/iconsComponent/IconLogout';
 import { useSingleAsync } from '@hook/useAsync';
 interface IRenderMenuProps {
   listNav: Array<IRouter>;
@@ -81,7 +82,11 @@ const SiderComponent: React.FC<{
         <div className="menu">
           <RenderMenu listNav={privatePage} location={location.pathname} />
         </div>
-        <div className='logout' onClick={SignOut}>
+        <div className='logout d-flex' onClick={SignOut}>
+          <div style={{ marginRight: 5 }}>
+            <IconLogout />
+          </div>
+
           Đăng xuất
         </div>
       </div>

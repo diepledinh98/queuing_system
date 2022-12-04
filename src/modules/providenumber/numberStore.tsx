@@ -6,6 +6,20 @@ import { useState, useEffect } from "react";
 import { device } from "@assets/svg";
 
 const db = FirebaseConfig.getInstance().fbDB
+
+interface TypeDevices {
+    devicecategory: any;
+    id?: string
+    deviceID?: string
+    deviceName?: string
+    deviceIP?: string
+    deviceStatus?: boolean
+    deviceConnect?: boolean
+
+    services?: string[]
+    detail?: string
+    update?: string
+}
 type serviceProps = {
     id?: string
     serviceID: string;
@@ -37,6 +51,7 @@ type provideNumberProps = {
     status: string
     service: serviceProps
     customer: accountStore
+    devices: TypeDevices
 };
 
 interface ProvideNumber {

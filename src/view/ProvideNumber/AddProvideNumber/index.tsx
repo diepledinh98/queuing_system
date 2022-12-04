@@ -1,6 +1,6 @@
 import './style.scss';
 
-import { Space } from 'antd';
+import { message, Space } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import React, { Key, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -30,7 +30,18 @@ import { createProvideNumber } from '@modules/providenumber/numberStore';
 import { fetchServices } from '@modules/service/serviceStore';
 import { fetchAccounts } from '@modules/account/accoutStore';
 import { useAppSelector, useAppDispatch } from '@shared/hook/reduxhook';
-
+interface TypeDevices {
+    id?: string
+    deviceID?: string
+    deviceName?: string
+    deviceIP?: string
+    deviceStatus?: boolean
+    deviceConnect?: boolean
+    devicecategory: string
+    services?: string[]
+    detail?: string
+    update?: string
+}
 type serviceProps = {
     id?: string
     serviceID: string;
@@ -62,6 +73,7 @@ type provideNumberProps = {
     status: string
     service: serviceProps
     customer: accountStore
+    devices: TypeDevices
 };
 
 const ProvideNumber = () => {
@@ -85,7 +97,7 @@ const ProvideNumber = () => {
     var minutes = presentDate.getMinutes()
 
     var time = `${hour < 10 ? `0${hour}` : hour}:${minutes < 10 ? `0${minutes}` : minutes} - ${date < 10 ? `0${date}` : date}/${month < 10 ? `0${month}` : month}/${year}`
-    var dated = `${hour < 10 ? `0${hour}` : hour}:${minutes < 10 ? `0${minutes}` : minutes} - ${date < 10 ? `0${date}` : date}/${month < 10 ? `0${month}` : month}/${year + 1}`
+    var dated = `${hour < 10 ? `0${hour}` : hour}:${minutes < 10 ? `0${minutes}` : minutes} - ${date < 10 ? `0${date}` : date}/${(month + 1) < 10 ? `0${(month + 1)}` : (month + 1)}/${year + 1}`
     const services: Array<any> = useAppSelector((state) => {
         return state.service.services
     });
@@ -94,13 +106,13 @@ const ProvideNumber = () => {
     const customers: Array<accountStore> | any = useAppSelector((state) => {
         return state.account.accounts
     });
-
+    const devices: Array<accountStore> | any = useAppSelector((state) => {
+        return state.devicenew.devices
+    });
 
     const str: number = customers?.length
-    console.log(str);
     const indexCustomer = Math.floor(Math.random() * (str + 1))
-    console.log(indexCustomer);
-
+    const indexdevices = Math.floor(Math.random() * (devices.length + 1))
     useEffect(() => {
         dispatch(fetchServices())
         dispatch(fetchAccounts())
@@ -109,36 +121,32 @@ const ProvideNumber = () => {
         setIdService(value)
 
     };
+    const Cancel = () => {
+        navigate('/provide')
+    }
     const showModal = async () => {
 
-
-        var nameservice = services?.find((item) => item.id == idService);
-        setSername(nameservice)
-
-
-        // const docRef = await addDoc(collection(db, 'providenumber'), {
-        //     linkServiceId: idService,
-        //     status: 'waiting',
-        //     stt: providedNumber,
-        //     timeprovide: time,
-        //     dateduse: dated,
-        //     service: nameservice
-        // })
-
-
-
-        const body: provideNumberProps = {
-            linkServiceId: idService,
-            status: 'waiting',
-            stt: providedNumber,
-            timeprovide: time,
-            dateduse: dated,
-            service: nameservice,
-            customer: customers[indexCustomer]
+        if (idService === '') {
+            message.error('Bạn chưa chọn dịch vụ.')
         }
-        dispatch(createProvideNumber(body))
+        else {
+            var nameservice = services?.find((item) => item.id == idService);
+            setSername(nameservice)
+            const body: provideNumberProps = {
+                linkServiceId: idService,
+                status: 'waiting',
+                stt: providedNumber,
+                timeprovide: time,
+                dateduse: dated,
+                service: nameservice,
+                devices: devices[indexdevices],
+                customer: customers[indexCustomer]
+            }
+            console.log(body);
 
-        setOpen(true);
+            dispatch(createProvideNumber(body))
+            setOpen(true);
+        }
 
     };
 
@@ -153,12 +161,12 @@ const ProvideNumber = () => {
     return (
         <div className="addprovidenumber__page">
             <MainTitleComponent breadcrumbs={routerViewAddProvideNumber} />
-            <div className='title'>Quản lý cấp số</div>
+            <div className='title'>{formatMessage('common.qlprovidenumber')}</div>
             <div className='main__page'>
                 <div>
 
-                    <div className='title__page'>CẤP SỐ MỚI</div>
-                    <div className='title__select__service'>Dịch vụ khách hàng lựa chọn</div>
+                    <div className='title__page'>{formatMessage('common.addnewprovide')}</div>
+                    <div className='title__select__service'>{formatMessage('common.dlkhlc')}</div>
                     <Select defaultValue="Chọn dịch vụ" onChange={handleChange}>
                         {services?.map((service, index) => {
                             return (
@@ -171,8 +179,8 @@ const ProvideNumber = () => {
                 </div>
 
                 <div className='btn'>
-                    <div className='btn__cancle'>Hủy bỏ</div>
-                    <div className='btn_inso' onClick={showModal}>In số</div>
+                    <div className='btn__cancle' onClick={Cancel}>{formatMessage('common.cancell')}</div>
+                    <div className='btn_inso' onClick={showModal}>{formatMessage('common.printnumber')}</div>
                 </div>
             </div>
 
@@ -187,17 +195,17 @@ const ProvideNumber = () => {
             >
                 <div className='modal_provide'>
                     <div className='content'>
-                        <div className='title'>Số thứ tự được câp</div>
+                        <div className='title'>{formatMessage('common.sttprovided')}</div>
                         <div className='number'>{providedNumber - 1}</div>
-                        <div className='service'> <span>(Tại quầy số 1)</span></div>
+                        <div className='service'> <span>({formatMessage('common.tq')})</span></div>
                     </div>
 
                 </div>
 
                 <div className='footer'>
                     <div className='time'>
-                        <div className=''>Thời gian cấp: {time}</div>
-                        <div className=''>Hạn sử dụng: {dated}</div>
+                        <div className=''>{formatMessage('common.timeprovide')}: {time}</div>
+                        <div className=''>{formatMessage('common.dated')}: {dated}</div>
                     </div>
                 </div>
 

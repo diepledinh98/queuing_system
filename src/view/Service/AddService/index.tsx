@@ -5,12 +5,12 @@ import { useNavigate } from 'react-router';
 import MainTitleComponent from '@shared/components/MainTitleComponent';
 import useTable from '@shared/components/TableComponent/hook';
 import { useAltaIntl } from '@shared/hook/useTranslate';
-import { Col, Row, Input, Checkbox } from 'antd';
+import { Col, Row, Input, Checkbox, message } from 'antd';
 import './style.scss'
 import { FirebaseConfig } from 'src/firebase/configs';
 import { routerViewAddService } from './router';
 import { createService } from '@modules/service/serviceStore';
-import { useAppDispatch } from '@shared/hook/reduxhook';
+import { useAppDispatch, useAppSelector } from '@shared/hook/reduxhook';
 import { onAuthStateChanged } from 'firebase/auth'
 import { createHistorys } from '@modules/history/historyStore';
 type serviceProps = {
@@ -23,6 +23,7 @@ type serviceProps = {
     Prefix?: string | number
     Surfix?: string | number
     Reset?: boolean | number
+    CreateAt: string
 };
 interface AuthUser {
     email: string,
@@ -59,9 +60,9 @@ const Service = () => {
     const [numberSurfix, setNumberSurfix] = useState('0001')
     const [reset, setReset] = useState(false)
     const [usercurrent, setUsercurrent] = useState<AuthUser | any>(null)
-    const handleCancel = () => {
-        navigate('/service')
-    }
+
+    const services = useAppSelector((state) => state.service.services)
+
     var presentDate = new Date();
     var date = presentDate.getDate()
     var month = presentDate.getMonth()
@@ -69,31 +70,51 @@ const Service = () => {
     var hour = presentDate.getHours()
     var minutes = presentDate.getMinutes()
     var seconds = presentDate.getSeconds()
-    var time = ` ${date}/${month}/${year} ${hour}:${minutes}:${seconds}`
+    var time = `${hour < 10 ? `0${hour}` : hour}:${minutes < 10 ? `0${minutes}` : minutes} - ${date < 10 ? `0${date}` : date}/${month < 10 ? `0${month}` : month}/${year}`
+
+    const handleCancel = () => {
+        navigate('/service')
+    }
     const handleAddService = async () => {
 
-
-        const body: serviceProps = {
-            serviceID: serviceID,
-            serviceName: serviceName,
-            description: description,
-            serviceStatus: true,
-            Growauto: (checkautogrow ? [autoNumberFrom, autoNumberTo] : 0),
-            Prefix: (checkprefix ? prefixNumber : 0),
-            Surfix: (surfix ? numberSurfix : 0),
-            Reset: reset
-        }
-        const bodyHistory: historyProps = {
-            username: usercurrent?.email,
-            time: time,
-            IP: '192.168.1.10',
-            action: `Thêm thông tin dịch vụ ${serviceName}`
-
+        var check: boolean = false
+        for (var index: number = 0; index < services.length; index = index + 1) {
+            if (services[index].serviceID === serviceID) {
+                check = true
+            }
         }
 
-        dispatch(createService(body))
-        dispatch(createHistorys(bodyHistory))
-        navigate('/service')
+
+        if (serviceID === '' || serviceName === '' || serviceName === '') {
+            message.error('Vui lòng điền các trường còn trống!')
+        }
+        else if (check) {
+            message.warning('Mã dịch vụ đã tồn tại!')
+        }
+        else {
+            const body: serviceProps = {
+                serviceID: serviceID,
+                serviceName: serviceName,
+                description: serviceName,
+                CreateAt: time,
+                serviceStatus: true,
+                Growauto: (checkautogrow ? [autoNumberFrom, autoNumberTo] : 0),
+                Prefix: (checkprefix ? prefixNumber : 0),
+                Surfix: (surfix ? numberSurfix : 0),
+                Reset: reset
+            }
+            const bodyHistory: historyProps = {
+                username: usercurrent?.email,
+                time: time,
+                IP: '192.168.1.10',
+                action: `Thêm thông tin dịch vụ ${serviceName}`
+
+            }
+
+            dispatch(createService(body))
+            dispatch(createHistorys(bodyHistory))
+            navigate('/service')
+        }
     }
 
     useEffect(() => {
@@ -105,20 +126,20 @@ const Service = () => {
         <div className="addservice__page">
             <MainTitleComponent breadcrumbs={routerViewAddService} />
             <div className='title__addservice'>
-                Quản lý dịch vụ
+                {formatMessage('common.serviceql')}
                 <div className='box__addservice'>
                     <div className='title_box'>
-                        Thông tin dịch vụ
+                        {formatMessage('common.serviceinfo')}
                     </div>
                     <Row>
                         <Col span={12}>
-                            <p>Mã dịch vụ: <span style={{ color: 'red' }}>*</span></p>
+                            <p>{formatMessage('common.serviceid')}: <span style={{ color: 'red' }}>*</span></p>
                             <Input className='info__input' onChange={(event) => setServiceID(event.target.value)} />
-                            <p>Tên dịch vụ: <span style={{ color: 'red' }}>*</span></p>
+                            <p>{formatMessage('common.servicename')}: <span style={{ color: 'red' }}>*</span></p>
                             <Input className='info__input' onChange={(event) => setServiceName(event.target.value)} />
                         </Col>
                         <Col span={12}>
-                            <p>Mô tả: <span style={{ color: 'red' }}>*</span></p>
+                            <p>{formatMessage('common.role.description')}: <span style={{ color: 'red' }}>*</span></p>
                             <TextArea
 
                                 onChange={(event) => setDescription(event.target.value)}
@@ -130,26 +151,26 @@ const Service = () => {
                     </Row>
 
                     <div className='provide__number'>
-                        Quy tắc cấp số
+                        {formatMessage('common.syntaxprobide')}
                         <div className='check' >
                             <Checkbox className='checkbox' style={{ marginLeft: 9 }} onChange={(event) => setCheckautogrow(event.target.checked)} >
-                                Tăng tự động từ:
+                                {formatMessage('common.autofrow')}:
                                 <Input className="input__number" defaultValue="0001" onChange={(event) => setAutoNumberFrom(event.target.value)} />
-                                đến
+                                {formatMessage('common.to')}:
                                 <Input className="input__number" defaultValue="9999" onChange={(event) => setAutoNumberTo(event.target.value)} />
                             </Checkbox>
                             <Checkbox className='checkbox' onChange={(event) => setCheckprefix(event.target.checked)}>
-                                Prefix:
+                                {formatMessage('common.prefix')}:
                                 <Input className="input__number" style={{ marginLeft: 80 }} defaultValue="0001" onChange={(event) => setPrefixNumber(event.target.value)} />
 
                             </Checkbox>
                             <Checkbox className='checkbox' onChange={(event) => setSurfix(event.target.checked)}>
-                                Surfix:
+                                {formatMessage('common.surfix')}:
                                 <Input className="input__number" style={{ marginLeft: 80 }} defaultValue="0001" onChange={(event) => setNumberSurfix(event.target.value)} />
 
                             </Checkbox>
                             <Checkbox className='checkbox' onChange={(event) => setReset(event.target.checked)}>
-                                Reset mỗi ngày
+                                {formatMessage('common.reset')}
                             </Checkbox>
                         </div>
                     </div>
@@ -157,10 +178,10 @@ const Service = () => {
 
                 <div className="action__add">
                     <div className="btn__add btn_cancel" onClick={handleCancel}>
-                        Hủy bỏ
+                        {formatMessage('common.cancell')}
                     </div>
                     <div className="btn__add btn__add_device" onClick={handleAddService}>
-                        Thêm dịch vụ
+                        {formatMessage('common.addservice')}
                     </div>
                 </div>
             </div>

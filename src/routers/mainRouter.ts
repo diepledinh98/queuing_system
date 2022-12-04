@@ -8,7 +8,7 @@ import { routerViewReport } from '@view/Report/router';
 import { routerViewRoot } from '@view/router';
 import { routerViewService } from '@view/Service/router';
 import { routerViewSetting } from '@view/SettingSystem/router';
-
+import { routerPageError } from '@view/PageError/router';
 import { IRouter } from './interface';
 import { routerViewAddDevice } from '@view/Device/AddDevice/router';
 import { routerViewDetailDevice } from '@view/Device/DetailDevice/router';
@@ -23,8 +23,8 @@ import { routerViewDetailProvideNumber } from '@view/ProvideNumber/DetailProvide
 import { routerViewAddRole } from '@view/SettingSystem/manage/Role/AddRole/router';
 import { routerViewUpdateRole } from '@view/SettingSystem/manage/Role/UpdateRole/router';
 export const privatePage: IRouter[] = [routerViewRoot, routerHomepage, routerViewProfile, routerViewAddDevice, routerViewDevice, routerViewDetailDevice,
-    routerViewReport, routerViewProvideNumber, routerViewService, routerViewSetting, routerViewUpdateDevice, routerViewAddService, routerViewDetailService,
-    routerViewUpdateService, routerViewAddProvideNumber, routerAddAccount, routerUpdateAccount, routerViewDetailProvideNumber, routerViewAddRole, routerViewUpdateRole
+    routerViewService, routerViewAddService, routerViewDetailService, routerViewUpdateService, routerViewProvideNumber, routerViewReport, routerViewSetting, routerViewUpdateDevice,
+    routerViewAddProvideNumber, routerAddAccount, routerUpdateAccount, routerViewDetailProvideNumber, routerViewAddRole, routerViewUpdateRole, routerPageError
 ];
 
 export const publicPage: IRouter[] = [routerLogin, routerForgotPassword];

@@ -114,7 +114,9 @@ const UpdateRole = () => {
         })
     }, [])
 
-
+    const handleCancel = () => {
+        navigate('/setting/manage/role')
+    }
     const handleAddRole = () => {
         const idRole = id
         const body: roleType = {
@@ -266,7 +268,7 @@ const UpdateRole = () => {
             </div>
 
             <div className='btn'>
-                <div className='btn-cancel'>
+                <div className='btn-cancel' onClick={handleCancel}>
                     {formatMessage('common.cancell')}
                 </div>
                 <div className='btn-add' onClick={handleAddRole}>

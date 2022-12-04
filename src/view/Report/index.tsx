@@ -1,6 +1,6 @@
 import './style.scss';
 
-import { Space, DatePicker } from 'antd';
+import { Space, DatePicker, Pagination } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import React, { Key, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -19,13 +19,15 @@ import TableComponent from '@shared/components/TableComponent';
 import useTable from '@shared/components/TableComponent/hook';
 import { useAltaIntl } from '@shared/hook/useTranslate';
 import { fetchProvideNumber } from '@modules/providenumber/numberStore';
-
+import * as FileSaver from 'file-saver';
+import * as XLSX from 'xlsx';
 import { IModal } from '../Homepage/interface';
 import { routerViewReport } from './router';
 import { useAppDispatch, useAppSelector } from '@shared/hook/reduxhook';
 import { provideNumberStore } from '@modules/providenumber/numberStore';
 import { getProvideNumber } from '@modules/providenumber/respository';
-const dataTable = require('./datareport.json');
+import moment from 'moment';
+const { RangePicker } = DatePicker
 interface DataType {
     id?: string
     reportNumber?: string
@@ -39,54 +41,55 @@ const Report = () => {
     const { formatMessage } = useAltaIntl();
     const table = useTable();
     let data: DataType[] | any;
-    const [modal, setModal] = useState<IModal>({
-        isVisible: false,
-        dataEdit: null,
-        isReadOnly: false,
-    });
-    const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+
+
     const [search, setSearch] = useState<string>('');
-    const [filter, setFilterOption] = useState<any>();
     const navigate = useNavigate();
     const idChooses = 'id'; //get your id here. Ex: accountId, userId,...
 
     const dispatch = useAppDispatch()
     const providenumber = useAppSelector((state) => state.providenumber.Number)
-
-    useEffect(() => {
-        dispatch(fetchProvideNumber())
-    }, [dispatch])
-    data = providenumber?.map((item, index) => {
-
-
+    const [dates, setDates] = useState<string[] | any>([])
+    var csvData: DataType[] | any
+    csvData = providenumber?.map((item, index) => {
         return {
             id: item?.id,
             reportNumber: item?.stt,
             serviceName: item.service.serviceName,
             GrantTime: item?.timeprovide,
             status: item?.status,
-            powerSupply: 'Kiosk'
+            powerSupply: item?.devices.devicecategory
+        }
+    })
+    data = providenumber?.map((item, index) => {
+        return {
+            id: item?.id,
+            reportNumber: item?.stt,
+            serviceName: item.service.serviceName,
+            GrantTime: item?.timeprovide,
+            status: item?.status,
+            powerSupply: item?.devices.devicecategory
         }
     })
 
     const columns: ColumnsType = [
         {
-            title: 'Số thứ tụ',
+            title: 'common.sothutu',
             dataIndex: 'reportNumber',
             align: 'left'
         },
         {
-            title: 'Tên dịch vụ',
+            title: 'common.servicename',
             className: 'column-money',
             dataIndex: 'serviceName',
             align: 'left',
         },
         {
-            title: 'Thời gian cấp',
+            title: 'common.timeprovide',
             dataIndex: 'GrantTime',
         },
         {
-            title: 'Tình trạng',
+            title: 'common.tr',
             dataIndex: 'status',
             render: (status: string) => (
                 <>
@@ -101,7 +104,7 @@ const Report = () => {
         },
 
         {
-            title: 'Nguồn cấp',
+            title: 'common.nguon',
             dataIndex: 'powerSupply',
         }
     ];
@@ -110,33 +113,43 @@ const Report = () => {
     const linkAddDevice = () => {
         navigate('/AddDevice');
     }
+    // const resolve = () => {
+    //     return data.filter((item, index) => {
+    //         if (dates.length > 0) {
+    //             var dateprovide = new Date(item.GrantTime.slice(8))
+    //             var datefrom = new Date(dates[0].slice(8))
+    //             var dateto = new Date(dates[1].slice(8))
+    //             return dateprovide.getTime() >= datefrom.getTime() && dateprovide.getTime() <= dateto.getTime()
+    //         }
+    //         else {
+    //             return item
+    //         }
+    //     })
 
-    const handleRefresh = () => {
-        table.fetchData({ option: { search: search, filter: { ...filter } } });
-        setSelectedRowKeys([]);
-    };
+    // }
 
+    const [current, setCurrent] = useState(1)
+    //pagination 
+    const pageSize = 10
+    const getData = (current: any, pageSize: any) => {
+        return data.slice((current - 1) * pageSize, current * pageSize)
+    }
 
-    const dataString: ISelect[] = [{ label: 'common.all', value: undefined }, { label: 'common.onaction', value: undefined }, { label: 'common.stopaction', value: undefined }];
+    const ExportCSV = () => {
+        let c
+        const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+        const fileExtension = '.xlsx';
 
-    const arraySelectFilter: ISelectAndLabel[] = [
-        { textLabel: 'Trạng thái hoạt động', dataString },
+        var fileName = 'report'
 
-    ];
+        const ws = XLSX.utils.json_to_sheet(csvData);
+        const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] };
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const data = new Blob([excelBuffer], { type: fileType });
+        FileSaver.saveAs(data, fileName + fileExtension);
 
-    useEffect(() => {
-        table.fetchData({ option: { search: search, filter: { ...filter } } });
-    }, [search, filter, table]);
+    }
 
-    const handleSearch = (searchKey: string) => {
-        setSearch(searchKey);
-    };
-
-    const onChangeSelectStatus = (name: string | undefined) => (status: any) => {
-        if (name && status) {
-            setFilterOption((pre: any) => ({ ...pre, [name]: status }));
-        }
-    };
     return (
         <div className="service__page">
             <MainTitleComponent breadcrumbs={routerViewReport} />
@@ -144,50 +157,50 @@ const Report = () => {
 
                 <div className="d-flex flex-row justify-content-md-between mb-3 align-items-end">
                     <div className="d-flex flex-row " style={{ gap: 10 }}>
-                        {arraySelectFilter.map(item => (
-                            <SelectAndLabelComponent
-                                onChange={onChangeSelectStatus(item.name)}
-                                key={item.name}
-                                className="margin-select"
-                                dataString={item.dataString}
-                                textLabel={item.textLabel}
-                            />
-                        ))}
+
                         <div className='select__time'>
-                            <p>Chọn thời gian</p>
-                            <Space direction="vertical" className='time'>
-                                <DatePicker picker="week" />
-                                <DatePicker picker="week" />
+                            <p>{formatMessage('common.selecttime')}</p>
+                            <Space direction="vertical" className='time' style={{ marginTop: 27, marginRight: 10 }}>
+                                <RangePicker picker="date" onChange={(values) => {
+                                    setDates(values?.map(item => {
+                                        return moment(item).format('HH:mm - DD/MM/YYYY')
+                                    }))
+                                }
+                                }
+                                />
                             </Space>
 
                         </div>
                     </div>
 
-                    <div className="d-flex flex-column ">
-                        <div className="label-select">{formatMessage('common.keyword')}</div>
-                        <SearchComponent
-                            onSearch={handleSearch}
-                            placeholder={'common.keyword'}
-                            classNames="mb-0 search-table"
-                        />
-                    </div>
+
                 </div>
                 <div className='d-flex' >
+                    <div>
 
-                    <TableComponent
-                        // apiServices={}
-                        defaultOption={filter}
-                        translateFirstKey="homepage"
-                        rowKey={res => res[idChooses]}
-                        register={table}
-                        columns={columns}
-                        // onRowSelect={setSelectedRowKeys}
-                        dataSource={data}
-                        bordered
-                        disableFirstCallApi={true}
-                    />
-                    <div className='btn_add_device' onClick={linkAddDevice}>
-                        Tải về
+                        <TableComponent
+                            // apiServices={}
+
+                            translateFirstKey="homepage"
+                            rowKey={res => res[idChooses]}
+                            register={table}
+                            columns={columns}
+                            // onRowSelect={setSelectedRowKeys}
+                            dataSource={getData(current, pageSize)}
+                            bordered
+                            disableFirstCallApi={true}
+                            pagination={false}
+                        />
+                        <Pagination
+                            total={data?.length}
+                            current={current}
+                            onChange={setCurrent}
+                            pageSize={pageSize}
+                        />
+                    </div>
+                    <div className='btn_add_device' onClick={ExportCSV}>
+                        {formatMessage('common.download')}
+
                     </div>
                 </div>
             </div>

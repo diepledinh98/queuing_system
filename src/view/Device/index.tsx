@@ -4,55 +4,51 @@ import { Pagination, Space } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import React, { Key, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import ISelect from '@core/select';
-import RightMenu, { IArrayAction } from '@layout/RightMenu';
+
 import CircleLabel from '@shared/components/CircleLabel';
-import { DeleteConfirm } from '@shared/components/ConfirmDelete';
-import EditIconComponent from '@shared/components/EditIconComponent';
-import InformationIconComponent from '@shared/components/InformationIcon';
+
 import MainTitleComponent from '@shared/components/MainTitleComponent';
-import SearchComponent from '@shared/components/SearchComponent/SearchComponent';
-import SelectAndLabelComponent, {
-    ISelectAndLabel,
-} from '@shared/components/SelectAndLabelComponent';
 import TableComponent from '@shared/components/TableComponent';
 import useTable from '@shared/components/TableComponent/hook';
 import { useAltaIntl } from '@shared/hook/useTranslate';
-
-import { DownCircleTwoTone } from '@ant-design/icons'
 import { IModal } from '../Homepage/interface';
 import { routerViewDevice } from './router';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@modules';
 import { useAppDispatch, useAppSelector } from '@shared/hook/reduxhook';
-import { getDevices } from '@modules/device/respository';
-import { deviceStore } from '@modules/device/deviceStore';
+
 import { fetchDevicesNew } from '@modules/devicenew/devicenewStore';
-import { IconArrow } from '@shared/components/iconsComponent';
+import { accounttype } from '@view/SettingSystem/manage/Account/interface';
 import { IconAddDevice } from '@shared/components/iconsComponent';
-import { current } from '@reduxjs/toolkit';
+import { fetchAccounts } from '@modules/account/accoutStore';
 import { Select, Input } from 'antd';
-import { collection, DocumentData, onSnapshot, QuerySnapshot } from "firebase/firestore";
 import { FirebaseConfig } from 'src/firebase/configs';
 import { format } from 'path';
 const { Search } = Input;
 const { Option, OptGroup } = Select;
+import { onAuthStateChanged } from 'firebase/auth'
 const db = FirebaseConfig.getInstance().fbDB
+const auth = FirebaseConfig.getInstance().auth
 interface TypeDevices {
     id?: string
     deviceID?: string
     deviceName?: string
     deviceIP?: string
     deviceStatus?: boolean
+    devicecategory?: string
     deviceConnect?: boolean
     services?: string[]
     detail?: string
     update?: string
 }
-
+interface AuthUser {
+    uid?: string
+    email: string,
+}
+interface type {
+    userr: accounttype
+}
 const Device = () => {
 
-
+    const [usercurrent, setUsercurrent] = useState<AuthUser | any>(null)
     const [listDevice, setListDevice] = useState<TypeDevices[]>([])
     const [result, setResult] = useState<TypeDevices[] | undefined>();
     const { formatMessage } = useAltaIntl();
@@ -70,20 +66,22 @@ const Device = () => {
     const idChooses = 'id'; //get your id here. Ex: accountId, userId,...
     const [status, setStatus] = useState<string>('All')
     const [connect, setConnect] = useState<string>('All')
+    const [usercurr, setUsercurr] = useState<accounttype>()
     const dispatch = useAppDispatch();
     const devices: Array<any> | undefined = useAppSelector((state) => state.devicenew.devices);
 
+    const users: Array<any> | any = useAppSelector((state) => state.account.accounts);
 
     useEffect(() => {
 
-        // getDevices().then((deviceSnap) => {
-        //     dispatch(deviceStore.actions.fetchDevices({ devices: deviceSnap }));
-        // });
-
+        onAuthStateChanged(auth, (curr: any) => {
+            setUsercurrent(curr)
+        })
         dispatch(fetchDevicesNew())
+        dispatch(fetchAccounts())
     }, [dispatch]);
-
-
+    const user = users?.find((value) => value?.id == usercurrent?.uid);
+    console.log(user?.role.permitViewDevice);
 
     const onDetail = (id: string) => {
         navigate(`/detaildevice/${id}`)
@@ -248,9 +246,7 @@ const Device = () => {
         if (resolve(search, status, connect) && resolve(search, status, connect).length > 0) {
             return resolve(search, status, connect)?.slice((current - 1) * pageSize, current * pageSize)
         }
-        // else {
-        //     return devices?.slice((current - 1) * pageSize, current * pageSize)
-        // }
+
 
     }
 
@@ -262,18 +258,18 @@ const Device = () => {
                 <div className="d-flex flex-row justify-content-md-between mb-3 align-items-end">
                     <div className="d-flex flex-row " style={{ gap: 10 }}>
                         {/* {arraySelectFilter.map(item => {
-                            return (
-                                <SelectAndLabelComponent
-                                    onChange={onChangeSelectStatus(item.name)}
-                                    key={item.name}
-                                    className="margin-select"
-                                    dataString={item.dataString || dataStringConnect}
-                                    textLabel={item.textLabel}
-
-                                />
-                            )
-                        }
-                        )} */}
+                                return (
+                                    <SelectAndLabelComponent
+                                        onChange={onChangeSelectStatus(item.name)}
+                                        key={item.name}
+                                        className="margin-select"
+                                        dataString={item.dataString || dataStringConnect}
+                                        textLabel={item.textLabel}
+    
+                                    />
+                                )
+                            }
+                            )} */}
                         <div className='sortt'>
                             <label>{formatMessage('common.titleaction')}</label>
                             <Select defaultValue={formatMessage('common.all')} style={{ width: 200 }} className="margin-select" onChange={handleChangeStatus}>
@@ -295,11 +291,11 @@ const Device = () => {
                     <div className="d-flex flex-column ">
                         <div className="label-select">{formatMessage('common.keyword')}</div>
                         {/* <SearchComponent
-                            onSearch={handleSearch}
-                            placeholder={'common.keyword'}
-                            classNames="mb-0 search-table"
-                        /> */}
-                        <Search placeholder="input search text" onSearch={onSearch} />
+                                onSearch={handleSearch}
+                                placeholder={'common.keyword'}
+                                classNames="mb-0 search-table"
+                            /> */}
+                        <Search placeholder="Nhập tên thiết bị" onSearch={onSearch} />
                     </div>
                 </div>
                 <div className='d-flex' >
@@ -336,6 +332,8 @@ const Device = () => {
 
         </div>
     );
+
+
 };
 
 export default Device;

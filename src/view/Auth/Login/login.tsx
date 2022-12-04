@@ -83,7 +83,7 @@ const LoginPage: React.FC = () => {
                             </Form.Item>
                             {errorStatus === '' && <Link to={""} className="forgot-password" >Quên mật khẩu?</Link>}
                             {errorStatus && <RenderError errorStatus={errorStatus} />}
-                            <Button htmlType="submit" className="">
+                            <Button htmlType="submit" className="" style={{ width: 100 }}>
                                 {formatMessage('login.button.account')}
                             </Button>
                             {errorStatus !== '' && <Link to={""} className="forgot-password" style={{ textAlign: "center" }}>Quên mật khẩu?</Link>}

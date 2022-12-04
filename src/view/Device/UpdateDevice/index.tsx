@@ -1,14 +1,12 @@
 import React, { useEffect } from 'react'
 import MainTitleComponent from '@shared/components/MainTitleComponent';
 import { routerViewUpdateDevice } from './router'
-import { Avatar, Col, Row, Input, Select } from 'antd';
+import { Col, Row, Input, Select, message } from 'antd';
 import './update_device.scss'
 import { useParams } from 'react-router';
 import { useState } from 'react';
 import { useAppSelector, useAppDispatch } from '@shared/hook/reduxhook';
-import { async } from '@firebase/util';
 import { FirebaseConfig } from 'src/firebase/configs';
-import { doc, updateDoc } from "firebase/firestore";
 import { updateDevice } from '@modules/devicenew/devicenewStore';
 import { useNavigate } from 'react-router';
 import { createHistorys } from '@modules/history/historyStore';
@@ -20,6 +18,7 @@ interface deviceProps {
     deviceName: string;
     deviceIP: string;
     deviceStatus: boolean
+    devicecategory: string;
     deviceConnect: boolean
     services: string[]
     detail: string
@@ -46,6 +45,7 @@ const UpdateDevice = () => {
     const devices: Array<any> | undefined = useAppSelector((state) => {
         return state.devicenew.devices;
     });
+    const { Option, OptGroup } = Select;
     const navigate = useNavigate();
     const dispatch = useAppDispatch()
     const device = devices?.find((value) => value.id == id);
@@ -73,6 +73,9 @@ const UpdateDevice = () => {
             setUsercurrent(curr)
         })
     }, [])
+    const SelectCategory = (value: string) => {
+        setCatedevice(value)
+    }
     const HandleCancel = () => {
         navigate('/device')
     }
@@ -83,6 +86,7 @@ const UpdateDevice = () => {
             deviceIP: deviceIP,
             deviceName: deviceName,
             deviceID: deviceId,
+            devicecategory: catedevice,
             deviceStatus: device.deviceStatus,
             deviceConnect: device.deviceConnect,
             detail: 'chi tiết',
@@ -100,6 +104,7 @@ const UpdateDevice = () => {
         dispatch(createHistorys(bodyHistory))
         dispatch(updateDevice({ idDevice, body }))
         navigate('/device')
+
     }
 
     return (
@@ -121,10 +126,11 @@ const UpdateDevice = () => {
                             </Col>
                             <Col span={12}>
                                 <p className="name__add">{formatMessage('common.deviceType')} <span style={{ color: 'red' }}>*</span></p>
-                                <select className="add__input" placeholder="Chọn thiết bị" defaultValue={device.setDeviceName} onChange={(event) => setDeviceName(event.target.value)}>
-                                    <option value="kio01">KIO_01</option>
 
-                                </select>
+                                <Select defaultValue={device.devicecategory} onChange={SelectCategory}>
+                                    <Option value='Kiosk' >{formatMessage('common.kiosk')}</Option>
+                                    <Option value='displaycounter' >{formatMessage('common.displaycounter')}</Option>
+                                </Select>
                             </Col>
                         </Row>
                         <Row style={{ marginTop: 16 }}>

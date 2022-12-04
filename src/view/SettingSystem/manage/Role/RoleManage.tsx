@@ -4,27 +4,22 @@ import { ColumnsType } from 'antd/lib/table';
 import React, { Key, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import ISelect from '@core/select';
-import RightMenu, { IArrayAction } from '@layout/RightMenu';
-import CircleLabel from '@shared/components/CircleLabel';
-import { DeleteConfirm } from '@shared/components/ConfirmDelete';
-import EditIconComponent from '@shared/components/EditIconComponent';
-import InformationIconComponent from '@shared/components/InformationIcon';
+import './Role.scss'
 import MainTitleComponent from '@shared/components/MainTitleComponent';
-import SearchComponent from '@shared/components/SearchComponent/SearchComponent';
 import SelectAndLabelComponent, {
     ISelectAndLabel,
 } from '@shared/components/SelectAndLabelComponent';
 import TableComponent from '@shared/components/TableComponent';
 import useTable from '@shared/components/TableComponent/hook';
 import { useAltaIntl } from '@shared/hook/useTranslate';
-import { fetchProvideNumber } from '@modules/providenumber/numberStore';
 import { routerViewSetting } from '@view/SettingSystem/router';
 import { fetchRoles } from '@modules/rolenew/rolenewStore';
 import { useAppDispatch, useAppSelector } from '@shared/hook/reduxhook';
-import { provideNumberStore } from '@modules/providenumber/numberStore';
 import { IconAddDevice } from '@shared/components/iconsComponent';
-import { getProvideNumber } from '@modules/providenumber/respository';
+import { Select, Input, Pagination } from 'antd';
 import { Link } from 'react-router-dom';
+import { fetchAccounts } from '@modules/account/accoutStore';
+const { Search } = Input;
 interface DataType {
     id?: string
     reportNumber?: string
@@ -53,17 +48,35 @@ const RoleManage = () => {
 
     const dispatch = useAppDispatch()
     const roles = useAppSelector((state) => state.role.roles)
-
+    const accounts = useAppSelector((state) => state.account.accounts)
     useEffect(() => {
         dispatch(fetchRoles())
+        dispatch(fetchAccounts())
     }, [dispatch])
+
+    let dataName: { name: string, val: number }[] = []
+    dataName = roles.map((role, index) => {
+        return {
+            name: role.name,
+            val: 0
+        }
+    })
+    for (var i: number = 0; i < dataName.length; i = i + 1) {
+        for (var j: number = 0; j < accounts.length; j = j + 1) {
+            if (dataName[i].name === accounts[j].role.name) {
+                dataName[i].val = dataName[i].val + 1
+            }
+        }
+    }
     data = roles?.map((item, index) => {
-
-
         return {
             id: item?.id,
             rolename: item?.name,
-            numberuse: 2,
+            numberuse: dataName.map((use) => {
+                if (use.name === item?.name) {
+                    return use.val
+                }
+            }),
             description: item?.description,
             update: item
         }
@@ -88,12 +101,10 @@ const RoleManage = () => {
             dataIndex: 'description',
         },
         {
-            title: 'Cập nhật',
+            title: 'common.update',
             dataIndex: 'update',
             align: 'center',
             render: (record: role) => {
-                console.log(record);
-
 
                 return (
                     <>
@@ -113,29 +124,22 @@ const RoleManage = () => {
         navigate('/setting/manage/addrole');
     }
 
+    const onSearch = (value: string) => {
+        setSearch(value)
+    }
+    const resolve = (search: string) => {
+        return data?.filter((item) => {
+            return item.rolename.toLowerCase()?.includes(search.toLocaleLowerCase())
+        })
+    }
+    console.log(search);
 
-
-
-    const dataString: ISelect[] = [{ label: 'common.all', value: undefined }, { label: 'common.onaction', value: undefined }, { label: 'common.stopaction', value: undefined }];
-
-    const arraySelectFilter: ISelectAndLabel[] = [
-        { textLabel: 'Trạng thái hoạt động', dataString },
-
-    ];
-
-    useEffect(() => {
-        table.fetchData({ option: { search: search, filter: { ...filter } } });
-    }, [search, filter, table]);
-
-    const handleSearch = (searchKey: string) => {
-        setSearch(searchKey);
-    };
-
-    const onChangeSelectStatus = (name: string | undefined) => (status: any) => {
-        if (name && status) {
-            setFilterOption((pre: any) => ({ ...pre, [name]: status }));
-        }
-    };
+    const [current, setCurrent] = useState(1)
+    //pagination 
+    const pageSize = 10
+    const getData = (current: any, pageSize: any) => {
+        return resolve(search)?.slice((current - 1) * pageSize, current * pageSize)
+    }
     return (
         <div className="role__page">
             <MainTitleComponent breadcrumbs={routerViewSetting?.routes} />
@@ -147,27 +151,32 @@ const RoleManage = () => {
                     </div>
                     <div className="d-flex flex-column ">
                         <div className="label-select">{formatMessage('common.keyword')}</div>
-                        <SearchComponent
-                            onSearch={handleSearch}
-                            placeholder={'common.keyword'}
-                            classNames="mb-0 search-table"
-                        />
+                        <Search placeholder="Nhập tên thiết bị" onSearch={onSearch} />
                     </div>
                 </div>
                 <div className='d-flex' >
+                    <div>
 
-                    <TableComponent
-                        // apiServices={}
-                        defaultOption={filter}
-                        translateFirstKey="homepage"
-                        rowKey={res => res[idChooses]}
-                        register={table}
-                        columns={columns}
-                        // onRowSelect={setSelectedRowKeys}
-                        dataSource={data}
-                        bordered
-                        disableFirstCallApi={true}
-                    />
+                        <TableComponent
+                            // apiServices={}
+                            defaultOption={filter}
+                            translateFirstKey="homepage"
+                            rowKey={res => res[idChooses]}
+                            register={table}
+                            columns={columns}
+                            // onRowSelect={setSelectedRowKeys}
+                            dataSource={getData(current, pageSize)}
+                            bordered
+                            disableFirstCallApi={true}
+                            pagination={false}
+                        />
+                        <Pagination
+                            total={data?.length}
+                            current={current}
+                            onChange={setCurrent}
+                            pageSize={pageSize}
+                        />
+                    </div>
                     <div className='btn_add_device' onClick={linkAddRole}>
                         <IconAddDevice />
                         {formatMessage('common.addrole')}

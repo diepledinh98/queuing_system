@@ -2,17 +2,15 @@ import './AddRole.scss'
 import React, { Key, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import MainTitleComponent from '@shared/components/MainTitleComponent';
-import TableComponent from '@shared/components/TableComponent';
-import useTable from '@shared/components/TableComponent/hook';
 import { useAltaIntl } from '@shared/hook/useTranslate';
 import { routerViewAddRole } from './router';
-import { Input, Checkbox } from 'antd';
+import { Input, Checkbox, message } from 'antd';
 import { useAppDispatch, useAppSelector } from '@shared/hook/reduxhook';
 import { onAuthStateChanged } from 'firebase/auth'
 import { createHistorys } from '@modules/history/historyStore';
 import { FirebaseConfig } from 'src/firebase/configs';
 import { createRoles } from '@modules/rolenew/rolenewStore';
-import { updateRoles } from '@modules/rolenew/rolenewStore';
+
 const { TextArea } = Input;
 export interface roleType {
     id?: string
@@ -106,46 +104,53 @@ const AddRole = () => {
         navigate('/setting/manage/role')
     }
     const handleUpdateRole = () => {
-        const body: roleType = {
-            name: name,
-            description: description,
 
-            permitViewDevice: permitViewDevice,
-            permitDetailDevice: permitDetailDevice,
-            permitAddDevice: permitAddDevice,
-            permitUpdateDevice: permitUpdateDevice,
-
-            permitViewService: permitViewService,
-            permitAddService: permitAddService,
-            permitDetailService: permitDetailService,
-            permitUpdateService: permitUpdateService,
-
-            permitViewNumber: permitViewNumber,
-            permitDetailNumber: permitDetailNumber,
-            permitAddNumber: permitAddNumber,
-
-            permitViewReport: permitViewReport,
-
-            permitViewRole: permitViewRole,
-            permitAddRole: permitAddRole,
-            permitUpdateRole: permitUpdateRole,
-
-            permitViewAccount: permitViewAccount,
-            permitAddAccount: permitAddAccount,
-            permitUpdateAccount: permitUpdateAccount,
-
-            permitViewHistory: permitViewHistory
+        if (name === '' || description === '') {
+            message.error('Vui lòng điền các trường con trống!')
         }
-        const bodyHistory: historyProps = {
-            username: usercurrent?.email,
-            time: time,
-            IP: '192.168.1.10',
-            action: `Thêm thông tin vai trò ${name}`
+        else {
+            const body: roleType = {
+                name: name,
+                description: description,
+
+                permitViewDevice: permitViewDevice,
+                permitDetailDevice: permitDetailDevice,
+                permitAddDevice: permitAddDevice,
+                permitUpdateDevice: permitUpdateDevice,
+
+                permitViewService: permitViewService,
+                permitAddService: permitAddService,
+                permitDetailService: permitDetailService,
+                permitUpdateService: permitUpdateService,
+
+                permitViewNumber: permitViewNumber,
+                permitDetailNumber: permitDetailNumber,
+                permitAddNumber: permitAddNumber,
+
+                permitViewReport: permitViewReport,
+
+                permitViewRole: permitViewRole,
+                permitAddRole: permitAddRole,
+                permitUpdateRole: permitUpdateRole,
+
+                permitViewAccount: permitViewAccount,
+                permitAddAccount: permitAddAccount,
+                permitUpdateAccount: permitUpdateAccount,
+
+                permitViewHistory: permitViewHistory
+            }
+            const bodyHistory: historyProps = {
+                username: usercurrent?.email,
+                time: time,
+                IP: '192.168.1.10',
+                action: `Thêm thông tin vai trò ${name}`
+            }
+
+            dispatch(createRoles(body))
+            dispatch(createHistorys(bodyHistory))
+            navigate('/setting/manage/role')
         }
 
-        dispatch(createRoles(body))
-        dispatch(createHistorys(bodyHistory))
-        navigate('/setting/manage/role')
     }
 
     return (

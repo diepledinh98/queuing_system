@@ -71,8 +71,10 @@
         flex-direction: column;
     }
 
+
+
     .ant-input {
-        width: 300px !important;
+        width: 300px;
         height: 44px;
         background: #FFFFFF;
         /* Gray/$-gray-100 */
@@ -94,19 +96,20 @@
             border: 1px solid #D4D4D7 !important;
         }
     }
-}
-
-.ant-btn,
-button.ant-btn.normal-button,
-.ant-modal-confirm-btns button.ant-btn,
-button.ant-btn.cancel-button,
-.normal-button {
-    min-width: 40px !important;
-    min-height: none !important;
 
 
-    border-top-right-radius: 8px !important;
-    border-bottom-right-radius: 8px !important;
+    .ant-btn,
+    button.ant-btn.normal-button,
+    .ant-modal-confirm-btns button.ant-btn,
+    button.ant-btn.cancel-button,
+    .normal-button {
+        min-width: 40px !important;
+        min-height: none !important;
 
-    box-shadow: none !important;
+
+        border-top-right-radius: 8px !important;
+        border-bottom-right-radius: 8px !important;
+
+        box-shadow: none !important;
+    }
 }

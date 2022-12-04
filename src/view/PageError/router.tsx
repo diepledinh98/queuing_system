@@ -1,7 +1,7 @@
 import { IRouter } from '@routers/interface';
 
 export const routerPageError: IRouter = {
-  path: '*',
+  path: '/errorpage',
   masterLayout: false,
   loader: import('@view/PageError'),
 };

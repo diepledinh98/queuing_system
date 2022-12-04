@@ -1,6 +1,6 @@
 import './style.scss';
 
-import { Space, DatePicker } from 'antd';
+import { Space, DatePicker, Input, Select, Pagination } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import React, { Key, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -8,8 +8,6 @@ import ISelect from '@core/select';
 import RightMenu, { IArrayAction } from '@layout/RightMenu';
 import CircleLabel from '@shared/components/CircleLabel';
 import { DeleteConfirm } from '@shared/components/ConfirmDelete';
-import EditIconComponent from '@shared/components/EditIconComponent';
-import InformationIconComponent from '@shared/components/InformationIcon';
 import MainTitleComponent from '@shared/components/MainTitleComponent';
 import SearchComponent from '@shared/components/SearchComponent/SearchComponent';
 import SelectAndLabelComponent, {
@@ -24,7 +22,9 @@ import { IModal } from '../Homepage/interface';
 import { routerViewService } from './router';
 import { useAppDispatch, useAppSelector } from '@shared/hook/reduxhook';
 import { fetchServices } from '@modules/service/serviceStore';
-
+import { IconAddDevice } from '@shared/components/iconsComponent';
+const { Search } = Input;
+const { Option, OptGroup } = Select;
 const Service = () => {
     const { formatMessage } = useAltaIntl();
     const table = useTable();
@@ -37,14 +37,16 @@ const Service = () => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
     const [search, setSearch] = useState<string>('');
     const [filter, setFilterOption] = useState<any>();
+    const [status, setStatus] = useState('All')
     const navigate = useNavigate();
     const idChooses = 'id'; //get your id here. Ex: accountId, userId,...
     const dispatch = useAppDispatch()
     const services = useAppSelector((state) => state.service.services)
+    const handleChangeStatus = (value: string) => {
+        setStatus(value)
+
+    }
     useEffect(() => {
-        // getServices().then((serviceSnap) => {
-        //     dispatch(serviceStore.actions.fetchService({ services: serviceSnap }))
-        // });
         dispatch(fetchServices())
     }, [dispatch]);
 
@@ -56,22 +58,22 @@ const Service = () => {
     }
     const columns: ColumnsType = [
         {
-            title: 'Mã dịch vụ',
+            title: 'common.serviceid',
             dataIndex: 'serviceID',
             align: 'left'
         },
         {
-            title: 'Tên dịch vụ',
+            title: 'common.servicename',
             className: 'column-money',
             dataIndex: 'serviceName',
             align: 'left',
         },
         {
-            title: 'Mô tả',
+            title: 'common.role.description',
             dataIndex: 'description',
         },
         {
-            title: 'Trạng thái hoạt động',
+            title: 'common.titleaction',
             dataIndex: 'serviceStatus',
             render: () => <CircleLabel text={formatMessage('common.statusActive')} colorCode="green" />,
         },
@@ -88,7 +90,7 @@ const Service = () => {
                         <a
                             onClick={() => onDetail(record.id)}
                             style={{ textDecoration: "underline", color: "#4277FF", }}
-                        >Chi tiết</a>
+                        >{formatMessage('common.detail')}</a>
                     </>
 
                 )
@@ -99,15 +101,12 @@ const Service = () => {
             dataIndex: 'update',
             align: 'center',
             render: (action: any, record: any) => {
-
-                console.log(record);
-
                 return (
                     <>
                         <a
                             onClick={() => onUpdate(record.id)}
                             style={{ textDecoration: "underline", color: "#4277FF", }}
-                        >Cập nhật</a>
+                        >{formatMessage('common.update')}</a>
                     </>
 
                 )
@@ -120,54 +119,44 @@ const Service = () => {
         navigate('/addservice');
     }
 
-    const handleRefresh = () => {
-        table.fetchData({ option: { search: search, filter: { ...filter } } });
-        setSelectedRowKeys([]);
-    };
-
-    const arrayAction: IArrayAction[] = [
-        {
-            iconType: 'add',
-            handleAction: () => {
-                setModal({ dataEdit: null, isVisible: true });
-            },
-        },
-        { iconType: 'share' },
-        {
-            iconType: 'delete',
-            disable: selectedRowKeys?.length === 0,
-            handleAction: () => {
-                DeleteConfirm({
-                    content: formatMessage('common.delete'),
-                    handleOk: () => {
-                        // call Api Delete here
-                        handleRefresh();
-                    },
-                    handleCancel: () => { },
-                });
-            },
-        },
-    ];
-    const dataString: ISelect[] = [{ label: 'common.all', value: undefined }, { label: 'common.onaction', value: undefined }, { label: 'common.stopaction', value: undefined }];
-
-    const arraySelectFilter: ISelectAndLabel[] = [
-        { textLabel: 'Trạng thái hoạt động', dataString },
-
-    ];
-
-    useEffect(() => {
-        table.fetchData({ option: { search: search, filter: { ...filter } } });
-    }, [search, filter, table]);
-
     const handleSearch = (searchKey: string) => {
         setSearch(searchKey);
     };
 
-    const onChangeSelectStatus = (name: string | undefined) => (status: any) => {
-        if (name && status) {
-            setFilterOption((pre: any) => ({ ...pre, [name]: status }));
+    const resolve = (search: string, status: string) => {
+        return services?.filter((item) => {
+
+            if (status === 'All') {
+
+
+                return item.serviceName.toLowerCase()?.includes(search.toLocaleLowerCase())
+
+            }
+            if (status === 'active') {
+
+                return item.serviceName.toLowerCase()?.includes(search.toLocaleLowerCase()) && item.serviceStatus === true
+
+            }
+            if (status === 'notActive') {
+
+                return item.serviceName.toLowerCase()?.includes(search.toLocaleLowerCase()) && item.serviceStatus === false
+
+            }
+        })
+    }
+
+
+    const [current, setCurrent] = useState(1)
+    //pagination 
+    const pageSize = 10
+    const getData = (current: any, pageSize: any) => {
+
+        if (resolve(search, status) && resolve(search, status).length > 0) {
+            return resolve(search, status)?.slice((current - 1) * pageSize, current * pageSize)
         }
-    };
+
+
+    }
     return (
         <div className="service__page">
             <MainTitleComponent breadcrumbs={routerViewService} />
@@ -175,20 +164,21 @@ const Service = () => {
 
                 <div className="d-flex flex-row justify-content-md-between mb-3 align-items-end">
                     <div className="d-flex flex-row " style={{ gap: 10 }}>
-                        {arraySelectFilter.map(item => (
-                            <SelectAndLabelComponent
-                                onChange={onChangeSelectStatus(item.name)}
-                                key={item.name}
-                                className="margin-select"
-                                dataString={item.dataString}
-                                textLabel={item.textLabel}
-                            />
-                        ))}
+                        <div className='sortt'>
+                            <label>{formatMessage('common.titleaction')}</label>
+                            <Select defaultValue={formatMessage('common.all')} className="margin-select" onChange={handleChangeStatus}>
+                                <Option value="All">{formatMessage('common.all')}</Option>
+                                <Option value="active">{formatMessage('common.onaction')}</Option>
+                                <Option value="notActive">{formatMessage('common.stopaction')}</Option>
+                            </Select>
+                        </div>
+
 
                         <div className='select__time'>
-                            <p>Chọn thời gian</p>
+                            <p>{formatMessage('common.selecttime')}</p>
                             <Space direction="vertical" className='time'>
                                 <DatePicker picker="week" />
+
                                 <DatePicker picker="week" />
                             </Space>
 
@@ -196,29 +186,40 @@ const Service = () => {
                     </div>
                     <div className="d-flex flex-column ">
                         <div className="label-select">{formatMessage('common.keyword')}</div>
-                        <SearchComponent
+                        {/* <SearchComponent
                             onSearch={handleSearch}
                             placeholder={'common.keyword'}
                             classNames="mb-0 search-table"
-                        />
+                        /> */}
+                        <Search placeholder="Nhập tên thiết bị" onSearch={handleSearch} />
                     </div>
                 </div>
                 <div className='d-flex' >
+                    <div>
 
-                    <TableComponent
-                        // apiServices={}
-                        defaultOption={filter}
-                        translateFirstKey="homepage"
-                        rowKey={res => res[idChooses]}
-                        register={table}
-                        columns={columns}
-                        // onRowSelect={setSelectedRowKeys}
-                        dataSource={services}
-                        bordered
-                        disableFirstCallApi={true}
-                    />
+                        <TableComponent
+                            // apiServices={}
+                            defaultOption={filter}
+                            translateFirstKey="homepage"
+                            rowKey={res => res[idChooses]}
+                            register={table}
+                            columns={columns}
+                            // onRowSelect={setSelectedRowKeys}
+                            dataSource={getData(current, pageSize)?.reverse()}
+                            bordered
+                            disableFirstCallApi={true}
+                            pagination={false}
+                        />
+                        <Pagination
+                            total={services?.length}
+                            current={current}
+                            onChange={setCurrent}
+                            pageSize={pageSize}
+                        />
+                    </div>
                     <div className='btn_add_device' onClick={linkAddService}>
-                        Thêm dịch vụ
+                        <IconAddDevice />
+                        {formatMessage('common.addservice')}
                     </div>
                 </div>
             </div>

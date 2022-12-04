@@ -6,13 +6,43 @@ import { useState, useEffect } from "react";
 import { device } from "@assets/svg";
 import { stat } from "fs";
 const db = FirebaseConfig.getInstance().fbDB
+export interface roleType {
+    id?: string
+    name: string
+    description: string
+    permitViewDevice: boolean
+    permitDetailDevice: boolean
+    permitAddDevice: boolean
+    permitUpdateDevice: boolean
+
+    permitViewService: boolean
+    permitAddService: boolean
+    permitDetailService: boolean
+    permitUpdateService: boolean
+
+    permitViewNumber: boolean
+    permitDetailNumber: boolean
+    permitAddNumber: boolean
+
+    permitViewReport: boolean
+
+    permitViewRole: boolean
+    permitAddRole: boolean
+    permitUpdateRole: boolean
+
+    permitViewAccount: boolean
+    permitAddAccount: boolean
+    permitUpdateAccount: boolean
+
+    permitViewHistory: boolean
+}
 type accountStore = {
     id?: string
     name: string
     image: string
     email: string
     phone: string
-    role: string
+    role: roleType
     status: string
     username: string
     password: string
@@ -43,18 +73,24 @@ export const fetchAccounts = createAsyncThunk("accountStore/fetchAccounts", asyn
     return accounts as Array<accountStore>;
 })
 
-export const createAccount = createAsyncThunk("accountStore/createAccount", async (body: Omit<accountStore, 'id'>, thunkAPI) => {
-    addDoc(collection(db, 'users'), {
+export const createAccount = createAsyncThunk("accountStore/createAccount", async ({ idAccount, body }: { idAccount: string, body: accountStore }, thunkAPI) => {
+
+    setDoc(doc(db, 'users', idAccount), {
         ...body
     })
+    // addDoc(collection(db, 'users'), {
+    //     ...body
+    // })
     return {
         ...body,
     } as accountStore;
 
 
+
+
 })
 export const updateAccount = createAsyncThunk("accountStore/updateAccount", async ({ idAccount, body }: { idAccount: string, body: accountStore }, thunkAPI) => {
-    const accountNeedUpdate = doc(db, "devices", idAccount);
+    const accountNeedUpdate = doc(db, "users", idAccount);
     updateDoc(accountNeedUpdate, { ...body })
     return {
         ...body,

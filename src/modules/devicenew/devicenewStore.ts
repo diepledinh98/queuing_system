@@ -12,6 +12,7 @@ export interface deviceProps {
     deviceName: string;
     deviceIP: string;
     deviceStatus: boolean
+    devicecategory: string;
     deviceConnect: boolean
     services: string[]
     detail: string

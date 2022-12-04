@@ -10,7 +10,9 @@ import { logo } from '@assets/images';
 const PageError = () => {
   const history = useNavigate();
   const intl = useIntl();
-
+  const handleBackHome = () => {
+    history('/')
+  }
   return (
     <div className="page-error">
       <div className="main-content">
@@ -21,7 +23,7 @@ const PageError = () => {
         <div className="page-not-found">{intl.formatMessage({ id: 'common.page.notfound' })}</div>
         <p className="note-404">{intl.formatMessage({ id: 'common.404note' })}</p>
         <Button className="btn-err">
-          <a onClick={() => history.push('/')}>{intl.formatMessage({ id: 'common.back' })}</a>
+          <a onClick={handleBackHome}>{intl.formatMessage({ id: 'common.back' })}</a>
         </Button>
       </div>
     </div>

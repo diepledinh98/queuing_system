@@ -1,22 +1,24 @@
 import React, { useEffect } from 'react'
 import MainTitleComponent from '@shared/components/MainTitleComponent';
 import { routerViewAddDevice } from './router'
-import { Avatar, Col, Row, Input, Select } from 'antd';
+import { Avatar, Col, Row, Input, Select, message } from 'antd';
 import { useState } from 'react';
 import { addDoc, collection } from "firebase/firestore";
 import { FirebaseConfig } from 'src/firebase/configs';
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch } from '@shared/hook/reduxhook';
+import { useAppDispatch, useAppSelector } from '@shared/hook/reduxhook';
 import './add_device.scss'
 import { createHistorys } from '@modules/history/historyStore';
 import { onAuthStateChanged } from 'firebase/auth'
 import { createDevice } from '@modules/devicenew/devicenewStore';
+
 import { useAltaIntl } from '@shared/hook/useTranslate';
 interface deviceProps {
     id?: string
     deviceID: string;
     deviceName: string;
     deviceIP: string;
+    devicecategory: string;
     deviceStatus: boolean
     deviceConnect: boolean
     services: string[]
@@ -36,6 +38,7 @@ interface AuthUser {
     email: string,
 }
 const AddDevice = () => {
+    const { Option, OptGroup } = Select;
     const { formatMessage } = useAltaIntl();
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
@@ -63,41 +66,67 @@ const AddDevice = () => {
     var seconds = presentDate.getSeconds()
     var time = `${hour < 10 ? `0${hour}` : hour}:${minutes < 10 ? `0${minutes}` : minutes} - ${date < 10 ? `0${date}` : date}/${month < 10 ? `0${month}` : month}/${year}`
 
+    const devices: Array<any> | undefined = useAppSelector((state) => state.devicenew.devices);
+
     useEffect(() => {
         onAuthStateChanged(auth, (curr: any) => {
             setUsercurrent(curr)
         })
     })
-    console.log(usercurrent);
+    const SelectCategory = (value: string) => {
+        setCatedevice(value)
+    }
+
+
+
 
     const addDevice = async () => {
 
-
-        const body: deviceProps = {
-            deviceIP: deviceIP,
-            deviceName: deviceName,
-            deviceID: deviceId,
-            deviceStatus: true,
-            deviceConnect: true,
-            detail: 'chi tiết',
-            update: 'cập nhật',
-            services: selectedItems,
-            username: deviceusername,
-            password: devicepassword
+        var check: boolean = false
+        for (var index: number = 0; index < devices.length; index = index + 1) {
+            if (devices[index].deviceID === deviceId) {
+                check = true
+            }
         }
-        const bodyHistory: historyProps = {
-            username: usercurrent?.email,
-            time: time,
-            IP: '192.168.1.10',
-            action: `Thêm thông tin thiết bị ${deviceName} `
+
+
+        if (deviceIP === '' || deviceName === '' || deviceId === '' || selectedItems.length === 0 || deviceusername === '' || devicepassword === '' || catedevice === '') {
+            message.error('Vui lòng điền các trường còn trống!')
         }
-        dispatch(createHistorys(bodyHistory))
-        dispatch(createDevice(body))
+        else if (check) {
+            message.warning('Mã thiết bị đã tồn tại!')
+        }
+        else {
+            const body: deviceProps = {
+                deviceIP: deviceIP,
+                deviceName: deviceName,
+                deviceID: deviceId,
+                deviceStatus: true,
+                deviceConnect: true,
+                devicecategory: catedevice,
+                detail: 'chi tiết',
+                update: 'cập nhật',
+                services: selectedItems,
+                username: deviceusername,
+                password: devicepassword
+            }
+            const bodyHistory: historyProps = {
+                username: usercurrent?.email,
+                time: time,
+                IP: '192.168.1.10',
+                action: `Thêm thông tin thiết bị ${deviceName} `
+            }
+            dispatch(createHistorys(bodyHistory))
+            dispatch(createDevice(body))
 
 
+            navigate('/device')
+        }
+
+    }
+    const CanCel = () => {
         navigate('/device')
     }
-
     return (
         <div className='add__device_page'>
             <MainTitleComponent breadcrumbs={routerViewAddDevice} />
@@ -117,10 +146,12 @@ const AddDevice = () => {
                             </Col>
                             <Col span={12}>
                                 <p className="name__add">{formatMessage('common.deviceType')} <span style={{ color: 'red' }}>*</span></p>
-                                <select className="add__input" placeholder="Chọn thiết bị">
-                                    <option>Kiosk</option>
 
-                                </select>
+
+                                <Select defaultValue="Chọn dịch vụ" onChange={SelectCategory}>
+                                    <Option value='Kiosk' >{formatMessage('common.kiosk')}</Option>
+                                    <Option value='displaycounter' >{formatMessage('common.displaycounter')}</Option>
+                                </Select>
                             </Col>
                         </Row>
                         <Row style={{ marginTop: 16 }}>
@@ -161,7 +192,7 @@ const AddDevice = () => {
                     </div>
                 </div>
                 <div className="action__add">
-                    <div className="btn__add btn_cancel">
+                    <div className="btn__add btn_cancel" onClick={CanCel}>
                         {formatMessage('common.cancell')}
                     </div>
                     <div className="btn__add btn__add_device" onClick={addDevice}>

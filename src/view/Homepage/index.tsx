@@ -1,41 +1,61 @@
 import './style.scss';
-
-import { Space, Row, Col } from 'antd';
-import { ColumnsType } from 'antd/lib/table';
 import React, { Key, useEffect, useState } from 'react';
-
-import ISelect from '@core/select';
-import RightMenu, { IArrayAction } from '@layout/RightMenu';
-import CircleLabel from '@shared/components/CircleLabel';
-import { DeleteConfirm } from '@shared/components/ConfirmDelete';
-import EditIconComponent from '@shared/components/EditIconComponent';
-import InformationIconComponent from '@shared/components/InformationIcon';
 import MainTitleComponent from '@shared/components/MainTitleComponent';
-import SearchComponent from '@shared/components/SearchComponent/SearchComponent';
-import SelectAndLabelComponent, {
-  ISelectAndLabel,
-} from '@shared/components/SelectAndLabelComponent';
-import TableComponent from '@shared/components/TableComponent';
-import useTable from '@shared/components/TableComponent/hook';
 import { useAltaIntl } from '@shared/hook/useTranslate';
 
-import ModalComponents from './component/MainModal/ModalHomepage';
-import { IModal } from './interface';
 import { routerHomepage } from './router';
-import { CalendarOutlined, LaptopOutlined } from '@ant-design/icons';
+import { DesktopOutlined, MessageOutlined, DatabaseOutlined } from '@ant-design/icons';
 import { Area } from '@ant-design/plots';
-import { Select, Progress, Calendar, Tag } from 'antd';
-import IconNumberProvied from '@shared/components/iconsComponent/IconNumberProvied';
-const dataTable = require('./data.json');
-const { Option, OptGroup } = Select;
+import { Select, Progress } from 'antd';
+import ListOVerView from './component/ListOverView/ListOverView';
+import CalendarOverview from './component/Calendar/Calendar';
+import { fetchDevicesNew } from '@modules/devicenew/devicenewStore';
+import { fetchServices } from '@modules/service/serviceStore';
+import { useAppDispatch, useAppSelector } from '@shared/hook/reduxhook';
+import { fetchProvideNumber } from '@modules/providenumber/numberStore';
+import { fetchAccounts } from '@modules/account/accoutStore';
+const { Option } = Select;
 const Homepage = () => {
   const { formatMessage } = useAltaIntl();
-
   const [data, setData] = useState([]);
-
+  const dispatch = useAppDispatch()
+  const devices = useAppSelector((state) => state.devicenew.devices)
+  const services = useAppSelector((state) => state.service.services)
+  const providenumbers = useAppSelector((state) => state.providenumber.Number)
   useEffect(() => {
     asyncFetch();
-  }, []);
+    dispatch(fetchDevicesNew())
+    dispatch(fetchServices())
+    dispatch(fetchProvideNumber())
+    dispatch(fetchAccounts())
+  }, [dispatch]);
+
+
+  // resolve device
+  var activeDevice: number = 0
+  var notActiveDevice: number = 0
+
+  for (var i: number = 0; i < devices.length; i = i + 1) {
+    if (devices[i].deviceStatus === true) {
+      activeDevice = activeDevice + 1;
+    }
+    else {
+      notActiveDevice = notActiveDevice + 1
+    }
+  }
+
+  // resolve services 
+  var activeService: number = 0
+  var notActiveService: number = 0
+
+  for (var i: number = 0; i < services.length; i = i + 1) {
+    if (services[i].serviceStatus === true) {
+      activeService = activeService + 1;
+    }
+    else {
+      notActiveService = notActiveService + 1
+    }
+  }
 
   const asyncFetch = () => {
     fetch('https://gw.alipayobjects.com/os/bmw-prod/360c3eae-0c73-46f0-a982-4746a6095010.json')
@@ -58,166 +78,27 @@ const Homepage = () => {
     <div className="homepage">
       <div className='homepage_left'>
         <MainTitleComponent breadcrumbs={routerHomepage} />
-
+        <ListOVerView />
         <div className='title'>
-          Biểu đồ cấp số
+          {formatMessage('common.bieudocapso')}
         </div>
-        {/* <div className='list_graph'>
-          <div className='graph_item'>
-            <div className='name'>
-              <div className='border_icon'>
-                <CalendarOutlined className='icon' />
-              </div>
-              Số thứ tự <br /> đã cấp
-            </div>
-            <div className='number'>
-              4.221
-            </div>
-          </div>
-          <div className='graph_item'>
-            <div className='name'>
-              <CalendarOutlined className='icon' />
-              <div className='border_icon'>
 
-              </div>
-              Số thứ tự <br /> đã cấp
-            </div>
-            <div className='number'>
-              4.221
-            </div>
-          </div>
-          <div className='graph_item'>
-            <div className='name'>
-              <div className='border_icon'>
-                <CalendarOutlined className='icon' />
-              </div>
-              Số thứ tự <br /> đã cấp
-            </div>
-            <div className='number'>
-              4.221
-            </div>
-          </div>
-          <div className='graph_item'>
-            <div className='name'>
-              <div className='border_icon'>
-                <CalendarOutlined className='icon' />
-              </div>
-              Số thứ tự <br /> đã cấp
-            </div>
-            <div className='number'>
-              4.221
-            </div>
-          </div>
-        </div> */}
-        <Row className="homepage__list-information" gutter={13}>
-          <Col span={6} className="homepage__item-information">
-            <div className="homepage__item-information-card">
-              <div className="homepage__item-information-card-head">
-                <div className="homepage__item-information-card-head-icon">
-                  <IconNumberProvied />
-                </div>
-                <span className="homepage__item-information-card-head-title">
-                  Số thứ tự đã cấp
-                </span>
-              </div>
-              <div className="homepage__item-information-card-body">
-                <span className="homepage__item-information-card-body-number">
-                  4221
-                </span>
-                <Tag
-                  className="homepage__item-information-card-body-percen"
-                // icon={<ArrowDownOutlined />}
-                >
-                  32.4%
-                </Tag>
-              </div>
-            </div>
-          </Col>
-          <Col span={6} className="homepage__item-information">
-            <div className="homepage__item-information-card">
-              <div className="homepage__item-information-card-head">
-                <div className="homepage__item-information-card-head-icon">
-                  <IconNumberProvied />
-                </div>
-                <span className="homepage__item-information-card-head-title">
-                  Số thứ tự đã cấp
-                </span>
-              </div>
-              <div className="homepage__item-information-card-body">
-                <span className="homepage__item-information-card-body-number">
-                  4221
-                </span>
-                <Tag
-                  className="homepage__item-information-card-body-percen"
-                // icon={<ArrowDownOutlined />}
-                >
-                  32.4%
-                </Tag>
-              </div>
-            </div>
-          </Col>
-          <Col span={6} className="homepage__item-information">
-            <div className="homepage__item-information-card">
-              <div className="homepage__item-information-card-head">
-                <div className="homepage__item-information-card-head-icon">
-                  <IconNumberProvied />
-                </div>
-                <span className="homepage__item-information-card-head-title">
-                  Số thứ tự đã cấp
-                </span>
-              </div>
-              <div className="homepage__item-information-card-body">
-                <span className="homepage__item-information-card-body-number">
-                  4221
-                </span>
-                <Tag
-                  className="homepage__item-information-card-body-percen"
-                // icon={<ArrowDownOutlined />}
-                >
-                  32.4%
-                </Tag>
-              </div>
-            </div>
-          </Col>
-          <Col span={6} className="homepage__item-information">
-            <div className="homepage__item-information-card">
-              <div className="homepage__item-information-card-head">
-                <div className="homepage__item-information-card-head-icon">
-                  <IconNumberProvied />
-                </div>
-                <span className="homepage__item-information-card-head-title">
-                  Số thứ tự đã cấp
-                </span>
-              </div>
-              <div className="homepage__item-information-card-body">
-                <span className="homepage__item-information-card-body-number">
-                  4221
-                </span>
-                <Tag
-                  className="homepage__item-information-card-body-percen"
-                // icon={<ArrowDownOutlined />}
-                >
-                  32.4%
-                </Tag>
-              </div>
-            </div>
-          </Col>
-        </Row>
+
         <div className='chart_info'>
           <div className='info'>
             <div className='date'>
-              Bảng thống kê <br />
+              <br />
               <span>
-                Tháng 11/2021
+                {formatMessage('common.thangchart')} 11/2021
               </span>
             </div>
             <div className='select'>
-              Xem theo
+
               <Select defaultValue="Ngày">
-                <Option>Ngày</Option>
-                <Option>Tuần</Option>
-                <Option>Tháng</Option>
-                <Option>Năm</Option>
+                <Option> {formatMessage('common.day')}</Option>
+                <Option> {formatMessage('common.week')}</Option>
+                <Option> {formatMessage('common.thangchart')}</Option>
+
               </Select>
             </div>
           </div>
@@ -229,71 +110,37 @@ const Homepage = () => {
       </div>
       <div className='homepage_right'>
         <div className='title_right'>
-          Tổng quan
+          {formatMessage('common.tqq')}
         </div>
         <div className='tq_item'>
           <div className='progress1'>
-            <Progress type="circle" percent={90} className="device_out" />
-            <Progress type="circle" percent={30} className="device_in" />
+            <Progress type="circle" percent={Math.ceil((activeDevice / devices.length) * 100)} className="device_out" strokeColor={{ '#FF7506': '#FF7506' }} width={60} style={{ top: 11, left: 16, position: 'absolute' }} />
+            <Progress type="circle" percent={Math.ceil((notActiveDevice / devices.length) * 100)} className="device_in" width={50} style={{ top: 16, left: 21, position: 'absolute' }} strokeColor={{ '#7E7D88': '#7E7D88' }} />
           </div>
-          <div className='tq_name'>
-            4.221
+          <div className='tq_name' style={{ color: '#FF7506' }}>
+            {devices.length}
             <span>
-              <LaptopOutlined />
-              Thiết bị
+              <DesktopOutlined style={{ marginRight: 2 }} />
+              {formatMessage('common.device')}
             </span>
           </div>
           <div className='tq_info'>
             <div className='tq_info_item'>
               <div className='dot' style={{ backgroundColor: '#FF7506' }}></div>
               <div className='info_item_name'>
-                Đang hoạt động
+                {formatMessage('common.statusActive')}
               </div>
               <div className='info_item_number'>
-                3.799
+                {activeDevice}
               </div>
             </div>
             <div className='tq_info_item'>
               <div className='dot' style={{ backgroundColor: '#7E7D88' }}></div>
               <div className='info_item_name'>
-                Ngưng hoạt động
+                {formatMessage('common.statusNotActive')}
               </div>
               <div className='info_item_number'>
-                422
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className='tq_item'>
-          <div className='progress1'>
-            <Progress type="circle" percent={90} className="device_out" />
-            <Progress type="circle" percent={30} className="device_in" />
-          </div>
-          <div className='tq_name'>
-            4.221
-            <span>
-              <LaptopOutlined />
-              Thiết bị
-            </span>
-          </div>
-          <div className='tq_info'>
-            <div className='tq_info_item'>
-              <div className='dot' style={{ backgroundColor: '#FF7506' }}></div>
-              <div className='info_item_name'>
-                Đang hoạt động
-              </div>
-              <div className='info_item_number'>
-                3.799
-              </div>
-            </div>
-            <div className='tq_info_item'>
-              <div className='dot' style={{ backgroundColor: '#7E7D88' }}></div>
-              <div className='info_item_name'>
-                Ngưng hoạt động
-              </div>
-              <div className='info_item_number'>
-                422
+                {notActiveDevice}
               </div>
             </div>
           </div>
@@ -301,33 +148,77 @@ const Homepage = () => {
 
         <div className='tq_item'>
           <div className='progress1'>
-            <Progress type="circle" percent={90} className="device_out" />
-            <Progress type="circle" percent={30} className="device_in" />
+            <Progress type="circle" percent={Math.ceil((activeService / services.length) * 100)} className="device_out" width={60} style={{ top: 11, left: 16, position: 'absolute' }} />
+            <Progress type="circle" percent={Math.ceil((notActiveService / services.length) * 100)} className="device_in" width={50} style={{ top: 16, left: 21, position: 'absolute' }} strokeColor={{ '#7E7D88': '#7E7D88' }} />
           </div>
-          <div className='tq_name'>
-            4.221
-            <span>
-              <LaptopOutlined />
-              Thiết bị
+          <div className='tq_name' >
+            {services.length}
+            <span style={{ color: '#4277FF' }}>
+              <MessageOutlined style={{ marginRight: 2 }} />
+              {formatMessage('common.service')}
             </span>
           </div>
           <div className='tq_info'>
             <div className='tq_info_item'>
               <div className='dot' style={{ backgroundColor: '#FF7506' }}></div>
               <div className='info_item_name'>
-                Đang hoạt động
+                {formatMessage('common.statusActive')}
               </div>
-              <div className='info_item_number'>
-                3.799
+              <div className='info_item_number' style={{ color: '#4277FF' }} >
+                {activeService}
               </div>
             </div>
             <div className='tq_info_item'>
               <div className='dot' style={{ backgroundColor: '#7E7D88' }}></div>
               <div className='info_item_name'>
-                Ngưng hoạt động
+                {formatMessage('common.statusNotActive')}
               </div>
-              <div className='info_item_number'>
-                422
+              <div className='info_item_number' style={{ color: '#4277FF' }}>
+                {notActiveService}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className='tq_item'>
+          <div className='progress1'>
+            <Progress type="circle" percent={0} className="device_out" width={60} style={{ top: 11, left: 16, position: 'absolute' }} strokeColor={{ '#35C75A': '#35C75A' }} />
+            <Progress type="circle" percent={100} className="device_in" width={50} style={{ top: 16, left: 21, position: 'absolute' }} strokeColor={{ '#7E7D88': '#7E7D88' }} />
+            <Progress type="circle" percent={0} className="device_inn" width={40} style={{ top: 22, left: 26, position: 'absolute' }} strokeColor={{ '#FF7506': '#FF7506' }} />
+          </div>
+          <div className='tq_name' style={{ color: '#35C75A' }}>
+            {providenumbers.length}
+            <span>
+              <DatabaseOutlined style={{ marginRight: 2 }} />
+              {formatMessage('common.provide.number')}
+            </span>
+          </div>
+          <div className='tq_info'>
+            <div className='tq_info_item'>
+              <div className='dot' style={{ backgroundColor: '#FF7506' }}></div>
+              <div className='info_item_name'>
+                {formatMessage('common.used')}
+              </div>
+              <div className='info_item_number' style={{ color: '#35C75A' }}>
+                {0}
+              </div>
+            </div>
+            <div className='tq_info_item'>
+              <div className='dot' style={{ backgroundColor: '#7E7D88' }}></div>
+              <div className='info_item_name'>
+                {formatMessage('common.statuswaiting')}
+              </div>
+              <div className='info_item_number' style={{ color: '#35C75A' }}>
+                {providenumbers.length}
+              </div>
+            </div>
+            <div className='tq_info_item'>
+              <div className='dot' style={{ backgroundColor: '#7E7D88' }}></div>
+              <div className='info_item_name'>
+                {formatMessage('common.bq')}
+              </div>
+              <div className='info_item_number' style={{ color: '#35C75A' }}>
+                {0}
               </div>
             </div>
           </div>
@@ -336,7 +227,7 @@ const Homepage = () => {
 
 
         <div className="site-calendar-demo-card">
-          <Calendar fullscreen={false} />
+          <CalendarOverview />
         </div>
       </div>
 

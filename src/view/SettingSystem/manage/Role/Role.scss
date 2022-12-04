@@ -1,32 +1,10 @@
-.providenumber__page {
-
-    .ant-btn,
-    button.ant-btn.normal-button,
-    .ant-modal-confirm-btns button.ant-btn,
-    button.ant-btn.cancel-button,
-    .normal-button {
-        min-width: 40px !important;
-        min-height: none !important;
-
-
-        border-top-right-radius: 8px !important;
-        border-bottom-right-radius: 8px !important;
-
-        box-shadow: none !important;
-    }
-
-    label {
-        font-weight: 600;
-        font-size: 16px;
-        color: #282739;
-    }
-
+.role__page {
     .ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
-        width: 154px !important;
+        width: 300px;
     }
 
     .ant-input {
-        width: 154px !important;
+        width: 300px;
         height: 44px;
         background: #FFFFFF;
         /* Gray/$-gray-100 */
@@ -47,5 +25,20 @@
         &:hover {
             border: 1px solid #D4D4D7 !important;
         }
+    }
+
+    .ant-btn,
+    button.ant-btn.normal-button,
+    .ant-modal-confirm-btns button.ant-btn,
+    button.ant-btn.cancel-button,
+    .normal-button {
+        min-width: 40px !important;
+        min-height: none !important;
+
+
+        border-top-right-radius: 8px !important;
+        border-bottom-right-radius: 8px !important;
+
+        box-shadow: none !important;
     }
 }

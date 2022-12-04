@@ -1,6 +1,6 @@
 import './style.scss';
 
-import { Space, DatePicker } from 'antd';
+import { Space, DatePicker, message } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import React, { Key, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -48,6 +48,7 @@ type serviceProps = {
     Prefix?: string | number
     Surfix?: string | number
     Reset?: boolean | number
+    CreateAt: string
 };
 interface AuthUser {
     email: string,
@@ -88,7 +89,7 @@ const UpdateService = () => {
     var hour = presentDate.getHours()
     var minutes = presentDate.getMinutes()
     var seconds = presentDate.getSeconds()
-    var time = ` ${date}/${month}/${year} ${hour}:${minutes}:${seconds}`
+    var time = `${hour < 10 ? `0${hour}` : hour}:${minutes < 10 ? `0${minutes}` : minutes} - ${date < 10 ? `0${date}` : date}/${month < 10 ? `0${month}` : month}/${year}`
 
     useEffect(() => {
         if (service.Growauto !== 0) {
@@ -107,28 +108,44 @@ const UpdateService = () => {
 
     const hanldeUpdateservice = async () => {
 
-
-        const idService = id
-        const body: serviceProps = {
-            serviceID: serviceID,
-            serviceName: serviceName,
-            description: description,
-            serviceStatus: true,
-            Growauto: (checkautogrow ? [autoNumberFrom, autoNumberTo] : 0),
-            Prefix: (checkprefix ? prefixNumber : 0),
-            Surfix: (surfix ? numberSurfix : 0),
-            Reset: reset
-        }
-        const bodyHistory: historyProps = {
-            username: usercurrent?.email,
-            time: time,
-            IP: '192.168.1.10',
-            action: `Cập nhật thông tin dịch vụ ${serviceName}`
+        var check: boolean = false
+        for (var index: number = 0; index < services.length; index = index + 1) {
+            if (services[index].serviceID === serviceID) {
+                check = true
+            }
         }
 
-        dispatch(createHistorys(bodyHistory))
-        dispatch(updateService({ idService, body }))
-        navigate('/service')
+
+        if (serviceID === '' || serviceName === '' || serviceName === '') {
+            message.error('Vui lòng điền các trường còn trống!')
+        }
+        else if (check) {
+            message.warning('Mã dịch vụ đã tồn tại!')
+        }
+        else {
+            const idService = id
+            const body: serviceProps = {
+                serviceID: serviceID,
+                serviceName: serviceName,
+                description: description,
+                serviceStatus: true,
+                Growauto: (checkautogrow ? [autoNumberFrom, autoNumberTo] : 0),
+                Prefix: (checkprefix ? prefixNumber : 0),
+                Surfix: (surfix ? numberSurfix : 0),
+                Reset: reset,
+                CreateAt: time
+            }
+            const bodyHistory: historyProps = {
+                username: usercurrent?.email,
+                time: time,
+                IP: '192.168.1.10',
+                action: `Cập nhật thông tin dịch vụ ${serviceName}`
+            }
+
+            dispatch(createHistorys(bodyHistory))
+            dispatch(updateService({ idService, body }))
+            navigate('/service')
+        }
     }
 
     const handlecancle = () => {

@@ -90,7 +90,6 @@
     "imagemin": "8.0.1",
     "imagemin-gifsicle": "7.0.0",
     "imagemin-mozjpeg": "10.0.0",
-    
     "imagemin-svgo": "10.0.1",
     "imagemin-webpack": "^5.1.1",
     "lint-staged": "^13.0.3",
@@ -129,6 +128,7 @@
     "browserslist": "^4.21.4",
     "dotenv": "^16.0.3",
     "eslint-plugin-jsx-a11y": "^6.6.1",
+    "file-saver": "^2.0.5",
     "firebase": "^9.12.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
@@ -147,6 +147,7 @@
     "redux-logger": "^3.0.6",
     "redux-persist": "^6.0.0",
     "redux-persist-transform-filter": "^0.0.20",
-    "web-vitals": "^3.0.2"
+    "web-vitals": "^3.0.2",
+    "xlsx": "^0.18.5"
   }
 }

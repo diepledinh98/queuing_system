@@ -23,7 +23,7 @@ const middleware: any = [];
 if (process.env.NODE_ENV === 'development') {
   middleware.push(logger);
 }
-const store = createStore(persistedReducer, applyMiddleware(...middleware, thunk));
+const store = createStore(persistedReducer, applyMiddleware(/*...middleware,*/ thunk));
 export const persistor = persistStore(store);
 
 export default store;

@@ -11,6 +11,7 @@ type serviceProps = {
     serviceStatus: boolean
     description: string
     Growauto?: number | string[]
+    CreateAt: string
     Prefix?: string | number
     Surfix?: string | number
     Reset?: boolean | number
